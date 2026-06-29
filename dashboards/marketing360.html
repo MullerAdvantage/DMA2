@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing360 Health Dashboard</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f7f7f5;--bg3:#f0efe9;
+  --text:#1a1a18;--text2:#6b6b67;--text3:#9b9b96;
+  --border:#e0e0d8;--border2:#c8c8c0;
+  --info-bg:#e6f1fb;--info-text:#185FA5;--info-border:#b5d4f4;
+  --success-bg:#EAF3DE;--success-text:#27500A;--success-border:#c0dd97;
+  --warn-bg:#FAEEDA;--warn-text:#633806;--warn-border:#FAC775;
+  --danger-bg:#FCEBEB;--danger-text:#791F1F;--danger-border:#F7C1C1;
+  --radius:8px;--radius-lg:12px;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1a;--bg2:#242422;--bg3:#2a2a28;
+    --text:#f0efe9;--text2:#9b9b96;--text3:#6b6b67;
+    --border:#333330;--border2:#444440;
+    --info-bg:#0c2a44;--info-text:#85B7EB;--info-border:#185FA5;
+    --success-bg:#172E09;--success-text:#C0DD97;--success-border:#3B6D11;
+    --warn-bg:#2a1e08;--warn-text:#FAC775;--warn-border:#854F0B;
+    --danger-bg:#2a1010;--danger-text:#F09595;--danger-border:#A32D2D;
+  }
+}
+body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:100vh}
+.nav{background:var(--bg);border-bottom:0.5px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:var(--text)}
+.nav-brand i{font-size:20px;color:var(--info-text)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-badge{font-size:11px;padding:3px 10px;border-radius:20px;background:var(--success-bg);color:var(--success-text);border:0.5px solid var(--success-border);font-weight:500}
+.ghost-btn{font-size:12px;padding:5px 14px;border-radius:var(--radius);background:transparent;border:0.5px solid var(--border2);color:var(--text2);cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:5px}
+.ghost-btn:hover{background:var(--bg2)}
+.main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+.hero{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem}
+.hero-title{font-size:22px;font-weight:600;margin-bottom:6px}
+.hero-sub{font-size:14px;color:var(--text2);line-height:1.6;max-width:680px}
+.steps{display:flex;gap:0;margin-bottom:1.5rem;background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.step-item{flex:1;padding:14px 16px;display:flex;align-items:center;gap:10px;border-right:0.5px solid var(--border)}
+.step-item:last-child{border-right:none}
+.step-num{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text2);flex-shrink:0;transition:all .2s}
+.step-item.active .step-num{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}
+.step-item.done .step-num{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}
+.step-text{font-size:13px;color:var(--text2)}
+.step-item.active .step-text{color:var(--text);font-weight:500}
+.step-item.done .step-text{color:var(--success-text)}
+@media(max-width:600px){.step-text{display:none}.step-item{justify-content:center}}
+
+/* GUIDE */
+.guide-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:1.5rem}
+.guide-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.guide-item{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.guide-metric{font-size:12px;font-weight:600;margin-bottom:2px}
+.guide-where{font-size:11px;color:var(--text2)}
+
+/* UPLOAD */
+.upload-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:1.5rem;overflow:hidden}
+.card-head{padding:14px 20px;border-bottom:0.5px solid var(--border);font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--radius);margin:20px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .15s;position:relative;background:var(--bg2)}
+.upload-zone:hover,.upload-zone.drag{background:var(--bg3);border-color:var(--info-border)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:36px;color:var(--text3);margin-bottom:12px}
+.upload-title{font-size:15px;font-weight:500;margin-bottom:6px}
+.upload-sub{font-size:13px;color:var(--text2);margin-bottom:14px}
+.type-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.type-pill{font-size:11px;padding:3px 12px;border-radius:20px;background:var(--bg);border:0.5px solid var(--border);color:var(--text2);display:flex;align-items:center;gap:4px}
+.file-list{padding:0 20px 4px;display:flex;flex-direction:column;gap:6px}
+.file-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);font-size:13px}
+.file-name{flex:1;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-size{font-size:11px;color:var(--text3)}
+.file-status{font-size:11px;padding:2px 10px;border-radius:20px;white-space:nowrap;font-weight:500}
+.fs-pending{background:var(--bg3);color:var(--text3);border:0.5px solid var(--border)}
+.fs-reading{background:var(--info-bg);color:var(--info-text);border:0.5px solid var(--info-border)}
+.fs-done{background:var(--success-bg);color:var(--success-text);border:0.5px solid var(--success-border)}
+.fs-error{background:var(--danger-bg);color:var(--danger-text);border:0.5px solid var(--danger-border)}
+.file-remove{cursor:pointer;color:var(--text3);background:none;border:none;font-size:18px;line-height:1;padding:0 4px}
+.file-remove:hover{color:var(--danger-text)}
+.primary-btn{display:block;width:calc(100% - 40px);margin:16px 20px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;border-radius:var(--radius);background:var(--info-text);border:none;color:#fff;transition:opacity .15s}
+.primary-btn:hover{opacity:.88}
+.primary-btn:disabled{opacity:.35;cursor:not-allowed}
+.log-box{margin:0 20px 16px;padding:12px 14px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);font-size:12px;font-family:monospace;color:var(--text2);line-height:1.8;max-height:130px;overflow-y:auto;display:none}
+.log-line{display:block}
+.log-ok{color:var(--success-text)}.log-warn{color:var(--warn-text)}.log-err{color:var(--danger-text)}
+
+/* EXTRACTED */
+.section-hd{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:1.5rem}
+.extracted-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px}
+.ex-item{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.ex-label{font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:500}
+.ex-input{width:100%;font-size:20px;font-weight:600;border:none;border-bottom:1.5px solid var(--border2);background:transparent;color:var(--text);outline:none;padding:2px 0}
+.ex-input:focus{border-color:var(--info-text)}
+.ex-src{font-size:10px;color:var(--text3);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ex-missing{color:var(--danger-text)}
+
+/* OVERALL */
+.overall-card{border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:1.5rem;border:0.5px solid var(--border);display:flex;align-items:center;gap:20px}
+.overall-card.ob-green{background:var(--success-bg);border-color:var(--success-border)}
+.overall-card.ob-yellow{background:var(--warn-bg);border-color:var(--warn-border)}
+.overall-card.ob-red{background:var(--danger-bg);border-color:var(--danger-border)}
+.overall-score{font-size:48px;font-weight:700;line-height:1}
+.overall-score.os-green{color:#1E6B0A}.overall-score.os-yellow{color:#633806}.overall-score.os-red{color:#791F1F}
+@media(prefers-color-scheme:dark){.overall-score.os-green{color:#C0DD97}.overall-score.os-yellow{color:#FAC775}.overall-score.os-red{color:#F09595}}
+.overall-label{font-size:18px;font-weight:600;margin-bottom:4px}
+.ol-green{color:#1E6B0A}.ol-yellow{color:#633806}.ol-red{color:#791F1F}
+@media(prefers-color-scheme:dark){.ol-green{color:#C0DD97}.ol-yellow{color:#FAC775}.ol-red{color:#F09595}}
+.overall-sub{font-size:13px;color:var(--text2)}
+.overall-div{width:1px;height:48px;background:var(--border2);flex-shrink:0}
+.legend{display:flex;gap:16px;margin-bottom:1rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2)}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:1.5rem}
+.kpi-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px;position:relative;overflow:hidden}
+.kpi-accent{position:absolute;left:0;top:0;bottom:0;width:4px}
+.kpi-label{font-size:11px;color:var(--text2);margin-bottom:6px;padding-left:10px;font-weight:500}
+.kpi-value{font-size:24px;font-weight:600;padding-left:10px}
+.kpi-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 10px;border-radius:20px;margin-top:8px;margin-left:10px;font-weight:500}
+.badge-green{background:var(--success-bg);color:var(--success-text)}
+.badge-yellow{background:var(--warn-bg);color:var(--warn-text)}
+.badge-red{background:var(--danger-bg);color:var(--danger-text)}
+
+/* PANELS */
+.panel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-bottom:1.5rem}
+.panel{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid var(--border)}
+.panel-title{font-size:13px;font-weight:600}
+.status-pill{font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px}
+.sp-green{background:var(--success-bg);color:var(--success-text)}
+.sp-yellow{background:var(--warn-bg);color:var(--warn-text)}
+.sp-red{background:var(--danger-bg);color:var(--danger-text)}
+.panel-body{padding:14px 16px}
+.panel-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:0.5px solid var(--border);color:var(--text2)}
+.panel-row:last-of-type{border-bottom:none}
+.panel-val{font-weight:600;color:var(--text)}
+.diag-box{margin-top:12px;padding:12px 14px;border-radius:var(--radius);font-size:12px;line-height:1.7}
+.diag-green{background:var(--success-bg);color:var(--success-text)}
+.diag-yellow{background:var(--warn-bg);color:var(--warn-text)}
+.diag-red{background:var(--danger-bg);color:var(--danger-text)}
+.diag-title{font-weight:600;margin-bottom:6px;font-size:13px}
+.diag-list{padding-left:16px}
+.diag-list li{margin-bottom:3px}
+
+/* REPORT SECTION */
+.report-card{background:var(--bg);border:0.5px solid var(--success-border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1.5rem}
+.report-head{background:var(--success-bg);padding:16px 20px;border-bottom:0.5px solid var(--success-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
+.report-head-left{display:flex;align-items:center;gap:10px}
+.report-head-title{font-size:14px;font-weight:600;color:var(--success-text)}
+.report-head-sub{font-size:12px;color:var(--success-text);opacity:.8;margin-top:1px}
+.report-body{padding:20px}
+.verdict-box{border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;border:0.5px solid var(--border)}
+.verdict-box.vb-yes{background:var(--success-bg);border-color:var(--success-border)}
+.verdict-box.vb-no{background:var(--danger-bg);border-color:var(--danger-border)}
+.verdict-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:6px}
+.verdict-text{font-size:20px;font-weight:700}
+.vt-yes{color:#1E6B0A}.vt-no{color:#791F1F}
+@media(prefers-color-scheme:dark){.vt-yes{color:#C0DD97}.vt-no{color:#F09595}}
+.verdict-why{font-size:13px;color:var(--text2);margin-top:8px;line-height:1.7}
+.report-section{margin-bottom:16px}
+.rs-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.rs-body{font-size:13px;color:var(--text2);line-height:1.7}
+.rs-list{padding-left:18px;font-size:13px;color:var(--text2);line-height:1.7}
+.rs-list li{margin-bottom:5px}
+.rs-list li span{font-weight:600;color:var(--text)}
+.gen-report-btn{width:100%;padding:14px;font-size:14px;font-weight:600;cursor:pointer;border-radius:var(--radius);background:linear-gradient(135deg,#1A3A6B,#185FA5);border:none;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;margin-top:4px}
+.gen-report-btn:hover{opacity:.88}
+.gen-report-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ACTIONS */
+.action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:4px}
+.action-btn{padding:10px 16px;font-size:12px;font-weight:500;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);cursor:pointer;text-align:left;transition:background .15s;display:flex;align-items:center;gap:6px}
+.action-btn:hover{background:var(--bg3)}
+
+.hidden{display:none!important}
+.fade-in{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.footer{text-align:center;font-size:11px;color:var(--text3);padding:2rem 0 1rem;border-top:0.5px solid var(--border);margin-top:1rem}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand"><i class="ti ti-chart-bar"></i>Marketing360 Health Dashboard</div>
+  <div class="nav-right">
+    <span class="nav-badge" id="nav-status">Ready</span>
+    <button class="ghost-btn" onclick="resetAll()"><i class="ti ti-refresh" style="font-size:13px"></i>New scan</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <div class="hero fade-in">
+    <div class="hero-title">Upload your Marketing360 portal pages — get an instant health report + printable briefing</div>
+    <div class="hero-sub">Drop screenshots, PDFs, or saved HTML pages from your Marketing360 portal. Claude reads the numbers, scores every area, and generates a plain-English one-page report you can print and deliver.</div>
+  </div>
+
+  <div class="steps" id="steps-bar">
+    <div class="step-item active" id="s1"><div class="step-num" id="sn1">1</div><div class="step-text">Upload portal pages</div></div>
+    <div class="step-item" id="s2"><div class="step-num" id="sn2">2</div><div class="step-text">Extract & analyze</div></div>
+    <div class="step-item" id="s3"><div class="step-num" id="sn3">3</div><div class="step-text">Health dashboard</div></div>
+    <div class="step-item" id="s4"><div class="step-num" id="sn4">4</div><div class="step-text">Generate report</div></div>
+  </div>
+
+  <!-- GUIDE -->
+  <div class="guide-card fade-in">
+    <div class="guide-title"><i class="ti ti-map-2" style="color:var(--info-text);font-size:15px"></i>Where to save each page from Marketing360</div>
+    <div class="guide-grid">
+      <div class="guide-item"><div class="guide-metric">Monthly spend</div><div class="guide-where">Billing overview → spend summary</div></div>
+      <div class="guide-item"><div class="guide-metric">Leads this month</div><div class="guide-where">CRM → Contacts → filter by month</div></div>
+      <div class="guide-item"><div class="guide-metric">Booked projects</div><div class="guide-where">CRM → Contacts → status: Booked/Won</div></div>
+      <div class="guide-item"><div class="guide-metric">Active campaigns</div><div class="guide-where">Campaigns → overview page</div></div>
+      <div class="guide-item"><div class="guide-metric">Social posts</div><div class="guide-where">Social → activity / post history</div></div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="upload-card fade-in" id="upload-card">
+    <div class="card-head"><i class="ti ti-files" style="color:var(--info-text);font-size:16px"></i>Upload portal pages</div>
+    <div class="upload-zone" id="drop-zone">
+      <input type="file" id="file-input" multiple accept="image/*,.pdf,.html,.htm" onchange="handleFiles(this.files)">
+      <div class="upload-icon"><i class="ti ti-cloud-upload"></i></div>
+      <div class="upload-title">Drop files here or click to browse</div>
+      <div class="upload-sub">Upload multiple files — one per portal page</div>
+      <div class="type-pills">
+        <span class="type-pill"><i class="ti ti-photo" style="font-size:12px"></i>PNG / JPG screenshot</span>
+        <span class="type-pill"><i class="ti ti-file-type-pdf" style="font-size:12px"></i>PDF export</span>
+        <span class="type-pill"><i class="ti ti-code" style="font-size:12px"></i>Saved HTML page</span>
+      </div>
+    </div>
+    <div class="file-list" id="file-list"></div>
+    <button class="primary-btn" id="analyze-btn" onclick="runAnalysis()" disabled>
+      <i class="ti ti-brain" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>Analyze files &amp; generate health dashboard
+    </button>
+    <div class="log-box" id="log-box"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results-section" class="hidden">
+
+    <div class="card fade-in">
+      <div class="section-hd"><i class="ti ti-database" style="font-size:14px"></i>Extracted values <span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">— click any number to correct it</span></div>
+      <div class="extracted-grid" id="extracted-grid"></div>
+    </div>
+
+    <div class="section-hd"><i class="ti ti-heartbeat" style="font-size:14px"></i>Overall marketing health</div>
+    <div class="overall-card hidden fade-in" id="overall-bar"></div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="dot" style="background:#3B6D11"></div>Healthy — no action needed</div>
+      <div class="legend-item"><div class="dot" style="background:#BA7517"></div>Weak — take preventive steps</div>
+      <div class="legend-item"><div class="dot" style="background:#A32D2D"></div>Unhealthy — requires immediate action</div>
+    </div>
+
+    <div class="section-hd"><i class="ti ti-layout-grid" style="font-size:14px"></i>Key metrics at a glance</div>
+    <div class="kpi-grid fade-in" id="kpi-grid"></div>
+
+    <div class="section-hd"><i class="ti ti-report-analytics" style="font-size:14px"></i>Detailed health panels</div>
+    <div class="panel-grid fade-in" id="panel-grid"></div>
+
+    <!-- PLAIN ENGLISH REPORT + DOCX GENERATION -->
+    <div class="report-card fade-in" id="report-card">
+      <div class="report-head">
+        <div class="report-head-left">
+          <i class="ti ti-file-description" style="font-size:20px;color:var(--success-text)"></i>
+          <div>
+            <div class="report-head-title">Plain-English Briefing + Printable Report</div>
+            <div class="report-head-sub">Who, what, where, when, why — and exactly what to do about it</div>
+          </div>
+        </div>
+      </div>
+      <div class="report-body">
+        <div id="report-content"></div>
+        <button class="gen-report-btn" id="gen-report-btn" onclick="generateDocx()">
+          <i class="ti ti-download" style="font-size:16px"></i>Download Printable Word Report (.docx)
+        </button>
+        <div class="log-box" id="report-log" style="margin:12px 0 0"></div>
+      </div>
+    </div>
+
+    <div class="card fade-in">
+      <div class="section-hd"><i class="ti ti-tools" style="font-size:14px"></i>Quick actions</div>
+      <div class="action-grid">
+        <button class="action-btn" onclick="resetAll()"><i class="ti ti-upload" style="font-size:15px;color:var(--text2)"></i>Upload new files</button>
+        <button class="action-btn" onclick="window.print()"><i class="ti ti-printer" style="font-size:15px;color:var(--text2)"></i>Print this page</button>
+        <button class="action-btn" onclick="copyReport()"><i class="ti ti-copy" style="font-size:15px;color:var(--text2)"></i>Copy summary to clipboard</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">Marketing360 Health Dashboard &nbsp;·&nbsp; Powered by Claude AI &nbsp;·&nbsp; Data stays in your browser</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/docx@9.6.1/build/index.umd.js"></script>
+<script>
+const {
+  Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+  AlignmentType, LevelFormat, HeadingLevel, BorderStyle, WidthType,
+  ShadingType, VerticalAlign, PageNumberElement, Header, Footer
+} = docx;
+
+const FILES = [];
+let EX = {spend:null,leads:null,posts:null,campaigns:null,booked:null,target:60};
+let SRC = {};
+let REPORT_DATA = null;
+
+// DRAG AND DROP
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');handleFiles(e.dataTransfer.files)});
+
+function handleFiles(list){
+  for(const f of list) if(!FILES.find(x=>x.name===f.name&&x.size===f.size)) FILES.push(f);
+  renderFiles();
+  document.getElementById('analyze-btn').disabled = FILES.length===0;
+}
+
+function fmtSize(b){return b<1048576?(b/1024).toFixed(0)+'KB':(b/1048576).toFixed(1)+'MB'}
+
+function renderFiles(){
+  const el=document.getElementById('file-list');
+  el.innerHTML=FILES.map((f,i)=>{
+    const ext=f.name.split('.').pop().toLowerCase();
+    const ic=['png','jpg','jpeg','webp'].includes(ext)?'ti-photo':ext==='pdf'?'ti-file-type-pdf':'ti-code';
+    return `<div class="file-item">
+      <i class="ti ${ic}" style="font-size:18px;color:var(--text2)"></i>
+      <span class="file-name">${f.name}</span>
+      <span class="file-size">${fmtSize(f.size)}</span>
+      <span class="file-status fs-pending" id="fst-${i}">pending</span>
+      <button class="file-remove" onclick="removeFile(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function removeFile(i){FILES.splice(i,1);renderFiles();document.getElementById('analyze-btn').disabled=FILES.length===0}
+function setFS(i,state,label){const el=document.getElementById(`fst-${i}`);if(el){el.className=`file-status fs-${state}`;el.textContent=label}}
+
+function log(msg,cls='',boxId='log-box'){
+  const b=document.getElementById(boxId);b.style.display='block';
+  const l=document.createElement('span');l.className=`log-line ${cls}`;l.textContent='› '+msg;
+  b.appendChild(l);b.scrollTop=b.scrollHeight;
+}
+
+function setStep(n){
+  for(let i=1;i<=4;i++){
+    const el=document.getElementById('s'+i);el.classList.remove('active','done');
+    if(i<n)el.classList.add('done');else if(i===n)el.classList.add('active');
+    const nm=document.getElementById('sn'+i);
+    nm.innerHTML=i<n?'<i class="ti ti-check" style="font-size:13px"></i>':i;
+  }
+}
+
+async function toB64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file)})}
+async function toText(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsText(file)})}
+function stripHTML(h){const d=document.createElement('div');d.innerHTML=h;return(d.textContent||d.innerText||'').replace(/\s+/g,' ').trim()}
+
+async function analyzeFile(file,idx){
+  const ext=file.name.split('.').pop().toLowerCase();
+  const isImg=['png','jpg','jpeg','webp','gif'].includes(ext);
+  const isPDF=ext==='pdf';
+  const isHTML=['html','htm'].includes(ext);
+  setFS(idx,'reading','reading…');log(`Reading ${file.name}…`);
+  const sys=`You are a data extraction assistant for a Marketing360 marketing portal. Extract these marketing metrics from the content if present:
+- monthly_spend: total ad/marketing dollars spent this month (number, USD, no symbols)
+- leads: number of new leads or contacts created this month (integer)
+- social_posts: number of social media posts published this month (integer)
+- campaigns: number of active campaigns currently running (integer)
+- booked: number of booked, won, or closed projects this month (integer)
+Return ONLY a valid JSON object with exactly these keys. Use null for any not found. No explanation, no markdown.
+Example: {"monthly_spend":3500,"leads":42,"social_posts":18,"campaigns":3,"booked":6}`;
+  let messages;
+  try{
+    if(isHTML){
+      const html=await toText(file);
+      const text=stripHTML(html).slice(0,8000);
+      messages=[{role:'user',content:`Extract marketing metrics from this Marketing360 portal page:\n\n${text}`}];
+    }else if(isImg){
+      const b64=await toB64(file);
+      const mime={png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',gif:'image/gif'}[ext]||'image/png';
+      messages=[{role:'user',content:[{type:'image',source:{type:'base64',media_type:mime,data:b64}},{type:'text',text:'Extract marketing metrics from this Marketing360 portal screenshot.'}]}];
+    }else if(isPDF){
+      const b64=await toB64(file);
+      messages=[{role:'user',content:[{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},{type:'text',text:'Extract marketing metrics from this Marketing360 portal PDF.'}]}];
+    }else{log(`Skipping unsupported: ${file.name}`,'log-warn');setFS(idx,'error','unsupported');return{}}
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:sys,messages})});
+    const data=await resp.json();
+    if(!resp.ok)throw new Error(data.error?.message||'API error '+resp.status);
+    const raw=data.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(raw);
+    setFS(idx,'done','extracted ✓');
+    const found=Object.entries(parsed).filter(([,v])=>v!==null).map(([k])=>k);
+    log(`✓ ${file.name} — ${found.length?'found: '+found.join(', '):'no metrics found'}`,found.length?'log-ok':'log-warn');
+    return parsed;
+  }catch(e){setFS(idx,'error','error');log(`✗ ${file.name}: ${e.message}`,'log-err');return{}}
+}
+
+async function buildReportNarrative(metrics){
+  const {spend,leads,posts,campaigns,booked,target,cpl,cr,overall,leadsScore,postsScore,campScore,cplScore,crScore} = metrics;
+  const sys=`You are a plain-English marketing analyst for a roofing and exterior contracting company. You have been given marketing performance data. Write a concise, honest, no-jargon briefing covering exactly these sections in order. Use clear, direct sentences. No bullet points in the narrative text sections. Write as if explaining to a business owner over the phone.
+
+Return ONLY valid JSON with these exact keys:
+{
+  "verdict": "YES" or "NO",
+  "verdictReason": "2-4 sentences explaining why the marketing is or is not paying off, using the actual numbers",
+  "whoWhatWhere": "3-5 sentences covering: WHO is responsible for fixing this (owner, marketing360 rep, or both), WHAT is specifically going wrong or right, WHERE in the marketing funnel the breakdown is happening, and WHEN it needs to be addressed",
+  "hemorrhage": ["item1","item2","item3","item4"] — array of 3-5 plain-English strings, each one explaining a specific reason money is being lost or not converting. Each item should be 1-2 sentences max. If marketing IS paying off, describe any weak areas that could be stronger instead.",
+  "leadFixes": ["step1","step2","step3","step4"] — array of 4-5 numbered action steps to generate more leads, written plainly. Each step should name the specific action, where to do it, and why.",
+  "bookingFixes": ["step1","step2","step3","step4"] — array of 4 numbered action steps to convert more leads into booked jobs. Specific, actionable, plain English."
+}
+No extra text, no markdown, no explanation outside the JSON.`;
+  const userMsg=`Marketing data:
+- Monthly spend: $${spend.toLocaleString()}
+- Leads this month: ${leads} (target: ${target})
+- Cost per lead: $${Math.round(cpl)} (benchmark: $120)
+- Social posts: ${posts}/month (target: 20)
+- Active campaigns: ${campaigns} (target: 4)
+- Booked projects: ${booked}
+- Lead-to-booking rate: ${cr.toFixed(1)}% (target: 25%)
+- Overall health score: ${overall}/100
+- Spend efficiency score: ${cplScore}/100
+- Leads score: ${leadsScore}/100
+- Social score: ${postsScore}/100
+- Campaign score: ${campScore}/100
+- Booking score: ${crScore}/100
+
+Generate the briefing JSON now.`;
+  const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:sys,messages:[{role:'user',content:userMsg}]})});
+  const data=await resp.json();
+  if(!resp.ok)throw new Error(data.error?.message||'API error');
+  const raw=data.content.map(b=>b.text||'').join('').trim().replace(/```json|```/g,'').trim();
+  return JSON.parse(raw);
+}
+
+async function runAnalysis(){
+  const btn=document.getElementById('analyze-btn');
+  btn.disabled=true;btn.innerHTML='<i class="ti ti-loader" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>Analyzing files…';
+  setStep(2);setNavStatus('Analyzing…','info');
+  const results=[];
+  for(let i=0;i<FILES.length;i++) results.push({file:FILES[i].name,data:await analyzeFile(FILES[i],i)});
+  log('Merging extracted values…');
+  const merged={spend:null,leads:null,posts:null,campaigns:null,booked:null};
+  const src={};
+  for(const r of results){
+    const d=r.data;
+    if(d.monthly_spend!=null&&merged.spend==null){merged.spend=d.monthly_spend;src.spend=r.file}
+    if(d.leads!=null&&merged.leads==null){merged.leads=d.leads;src.leads=r.file}
+    if(d.social_posts!=null&&merged.posts==null){merged.posts=d.social_posts;src.posts=r.file}
+    if(d.campaigns!=null&&merged.campaigns==null){merged.campaigns=d.campaigns;src.campaigns=r.file}
+    if(d.booked!=null&&merged.booked==null){merged.booked=d.booked;src.booked=r.file}
+  }
+  EX={...merged,target:EX.target||60};SRC=src;
+  const missing=Object.entries(merged).filter(([,v])=>v===null).map(([k])=>k);
+  if(missing.length)log(`Not detected: ${missing.join(', ')} — enter manually below`,'log-warn');
+  log('Building health dashboard…','log-ok');
+  setStep(3);
+  document.getElementById('results-section').classList.remove('hidden');
+  renderExtracted();renderDashboard();
+  log('Generating plain-English briefing…','log-ok');
+  setStep(4);
+  try{
+    const m=calcMetrics();
+    const narrative=await buildReportNarrative(m);
+    REPORT_DATA={...m,narrative,reportDate:new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})};
+    renderReportSection(narrative,m);
+    log('Briefing ready — download your report below','log-ok');
+    setNavStatus('Report ready','success');
+    btn.innerHTML='<i class="ti ti-check" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>Analysis complete';
+  }catch(e){
+    log('Briefing generation failed: '+e.message,'log-err');
+    setNavStatus('Dashboard ready','success');
+    btn.innerHTML='<i class="ti ti-check" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>Dashboard complete';
+  }
+  document.getElementById('results-section').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderExtracted(){
+  const labels={spend:'Monthly spend ($)',leads:'Leads this month',posts:'Social posts',campaigns:'Active campaigns',booked:'Booked projects',target:'Lead target / month'};
+  const keys=['spend','leads','posts','campaigns','booked','target'];
+  document.getElementById('extracted-grid').innerHTML=keys.map(k=>{
+    const v=EX[k];const s=SRC[k];
+    return `<div class="ex-item">
+      <div class="ex-label">${labels[k]}</div>
+      <input class="ex-input" type="number" id="ev-${k}" value="${v!==null&&v!==undefined?v:''}" placeholder="not found" onchange="EX['${k}']=this.value===''?null:parseFloat(this.value);renderDashboard()">
+      <div class="ex-src">${s?'↑ from '+s.slice(0,30):'<span class="ex-missing">not detected — enter manually</span>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function getStatus(score){return score>=75?'green':score>=45?'yellow':'red'}
+function statusLabel(s){return s==='green'?'Healthy':s==='yellow'?'Weak':'Unhealthy'}
+
+function calcMetrics(){
+  const spend=EX.spend||0,leads=EX.leads||0,posts=EX.posts||0;
+  const campaigns=EX.campaigns||0,booked=EX.booked||0,target=EX.target||60;
+  const cpl=leads>0?spend/leads:9999;
+  const cr=leads>0?(booked/leads)*100:0;
+  const leadsScore=Math.min(100,Math.round((leads/target)*100));
+  const postsScore=posts>=20?100:posts>=12?70:posts>=6?45:20;
+  const campScore=campaigns>=4?100:campaigns===3?75:campaigns===2?50:campaigns===1?30:10;
+  const cplScore=cpl<=120?100:Math.max(0,Math.round(100-((cpl-120)/120)*100));
+  const crScore=cr>=25?100:cr>=15?75:cr>=8?50:Math.round(cr*2);
+  const overall=Math.round((leadsScore+postsScore+campScore+cplScore+crScore)/5);
+  return{spend,leads,posts,campaigns,booked,target,cpl,cr,leadsScore,postsScore,campScore,cplScore,crScore,overall};
+}
+
+const DIAG={
+  spend:{
+    green:{title:'Spend efficiency is strong',steps:['CPL is within the $120 benchmark','Monitor monthly to stay below threshold','Consider scaling budget to grow lead volume']},
+    yellow:{title:'Cost per lead is rising',steps:['Audit underperforming ad sets in Marketing360','Pause campaigns with CPL above $150','A/B test new creative and headlines','Shift budget to highest-converting channels']},
+    red:{title:'Spend is inefficient — action required',steps:['Pause all campaigns with CPL > $200 immediately','Pull the channel breakdown report in Marketing360','Identify which source is burning budget','Rebuild top campaigns with tighter targeting','Set CPL cap alerts in Marketing360']}
+  },
+  leads:{
+    green:{title:'Lead volume is on target',steps:['Maintain current campaign cadence','Track lead source breakdown weekly']},
+    yellow:{title:'Lead volume is below target',steps:['Increase social posting to 20+/month','Launch or reactivate a paid lead gen campaign','Add retargeting for website visitors','Check landing page form conversion (aim >15%)']},
+    red:{title:'Lead volume is critically low',steps:['Run an emergency paid campaign this week','Boost your top 2 social posts','Verify Marketing360 tracking is working correctly','Review Google Business Profile — add fresh reviews','Offer a limited-time free estimate promotion']}
+  },
+  social:{
+    green:{title:'Social cadence is healthy',steps:['Continue 20+/month rhythm','Mix: project photos, reviews, tips, FAQs']},
+    yellow:{title:'Social posting is inconsistent',steps:['Schedule posts in batches 2 weeks ahead','Aim for 5+ posts/week','Repurpose completed project photos immediately','Use Marketing360 social scheduler']},
+    red:{title:'Social presence is nearly silent',steps:['Post minimum 1x/day starting today','Share before/after photos of every project','Respond to all comments within 24hrs','Set up auto-posting in Marketing360']}
+  },
+  campaigns:{
+    green:{title:'Campaign coverage is strong',steps:['Review performance monthly','Test new audiences quarterly']},
+    yellow:{title:'Campaigns are limited in coverage',steps:['Add a retargeting campaign if not running one','Launch a seasonal promo campaign','Check if email nurture campaigns are active']},
+    red:{title:'Insufficient active campaigns',steps:['Launch brand awareness + lead gen + retargeting today','Contact your Marketing360 rep for a strategy review','Check if campaigns are paused due to billing']}
+  },
+  booking:{
+    green:{title:'Booking conversion is healthy',steps:['Keep lead response time under 1 hour','Keep follow-up sequence active in CRM']},
+    yellow:{title:'Booking rate is underperforming',steps:['Call new leads within 15 minutes of submission','Set up automated SMS follow-up in Marketing360','Review estimate pricing — losing on price?','Add reviews and project photos to proposals']},
+    red:{title:'Most leads are NOT converting',steps:['Audit response time — if >2hrs, fix this first','Set up drip emails for cold leads in Marketing360','Call ALL unbooked leads from past 30 days','Survey lost estimates for objection patterns','Consider a quick-decision booking incentive']}
+  }
+};
+
+function renderDashboard(){
+  const m=calcMetrics();
+  const {spend,leads,posts,campaigns,booked,target,cpl,cr}=m;
+  const ob=document.getElementById('overall-bar');
+  const os=getStatus(m.overall);
+  ob.className=`overall-card ob-${os}`;ob.classList.remove('hidden');
+  const msgs={green:'All key areas are performing well.',yellow:'A few areas need attention before they become costly.',red:'Critical areas require immediate action.'};
+  ob.innerHTML=`<div class="overall-score os-${os}">${m.overall}</div><div class="overall-div"></div><div><div class="overall-label ol-${os}">${statusLabel(os)} overall — ${m.overall}/100</div><div class="overall-sub">${msgs[os]}</div></div>`;
+  const kpis=[
+    {label:'Monthly spend',value:'$'+spend.toLocaleString(),score:m.cplScore},
+    {label:'Leads this month',value:leads,score:m.leadsScore},
+    {label:'Cost per lead',value:'$'+Math.round(cpl),score:m.cplScore},
+    {label:'Booking rate',value:cr.toFixed(1)+'%',score:m.crScore},
+    {label:'Social posts',value:posts,score:m.postsScore},
+    {label:'Active campaigns',value:campaigns,score:m.campScore},
+  ];
+  document.getElementById('kpi-grid').innerHTML=kpis.map(c=>{
+    const s=getStatus(c.score);
+    const colors={green:'#3B6D11',yellow:'#BA7517',red:'#A32D2D'};
+    return `<div class="kpi-card"><div class="kpi-accent" style="background:${colors[s]}"></div><div class="kpi-label">${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-badge badge-${s}">${s==='green'?'✓':s==='yellow'?'⚠':'✕'} ${statusLabel(s)}</div></div>`;
+  }).join('');
+  const panels=[
+    {key:'spend',title:'Spend efficiency',score:m.cplScore,rows:[['Monthly spend','$'+spend.toLocaleString()],['Leads generated',leads],['Cost per lead','$'+Math.round(cpl)],['CPL benchmark','$120']]},
+    {key:'leads',title:'Lead volume',score:m.leadsScore,rows:[['Leads this month',leads],['Monthly target',target],['Attainment',Math.round((leads/target)*100)+'%'],['Deficit / surplus',(leads-target>0?'+':'')+(leads-target)]]},
+    {key:'social',title:'Social media',score:m.postsScore,rows:[['Posts this month',posts],['Minimum target','20/mo'],['Cadence',posts>=20?'Strong':posts>=12?'Moderate':'Low'],['Still needed',Math.max(0,20-posts)]]},
+    {key:'campaigns',title:'Campaigns',score:m.campScore,rows:[['Active campaigns',campaigns],['Minimum target','4'],['Coverage',campaigns>=4?'Full':campaigns>=2?'Partial':'Minimal'],['Gap',Math.max(0,4-campaigns)+' short']]},
+    {key:'booking',title:'Lead → booking',score:m.crScore,rows:[['Total leads',leads],['Booked projects',booked],['Conversion rate',cr.toFixed(1)+'%'],['Healthy target','≥ 25%']]},
+  ];
+  document.getElementById('panel-grid').innerHTML=panels.map(p=>{
+    const s=getStatus(p.score);const d=DIAG[p.key][s];
+    return `<div class="panel"><div class="panel-head"><span class="panel-title">${p.title}</span><span class="status-pill sp-${s}">${statusLabel(s)}</span></div><div class="panel-body">${p.rows.map(r=>`<div class="panel-row"><span>${r[0]}</span><span class="panel-val">${r[1]}</span></div>`).join('')}<div class="diag-box diag-${s}"><div class="diag-title">${s==='green'?'✓':s==='yellow'?'⚠':'✕'} ${d.title}</div><ul class="diag-list">${d.steps.map(st=>`<li>${st}</li>`).join('')}</ul></div></div></div>`;
+  }).join('');
+}
+
+function renderReportSection(n,m){
+  const isYes=n.verdict==='YES';
+  const verdictColor=isYes?'#1E6B0A':'#791F1F';
+  const verdictText=isYes?'YES — YOUR MARKETING IS PAYING OFF':'NO — YOUR MARKETING IS NOT PAYING OFF';
+  document.getElementById('report-content').innerHTML=`
+    <div class="verdict-box ${isYes?'vb-yes':'vb-no'}">
+      <div class="verdict-label">Is the marketing paying off?</div>
+      <div class="verdict-text ${isYes?'vt-yes':'vt-no'}">${verdictText}</div>
+      <div class="verdict-why"><strong>Why:</strong> ${n.verdictReason}</div>
+    </div>
+    <div class="report-section">
+      <div class="rs-title"><i class="ti ti-user" style="font-size:14px;color:var(--info-text)"></i>Who, What, Where &amp; When</div>
+      <div class="rs-body">${n.whoWhatWhere}</div>
+    </div>
+    <div class="report-section">
+      <div class="rs-title" style="color:var(--danger-text)"><i class="ti ti-alert-triangle" style="font-size:14px"></i>Where the money is being lost</div>
+      <ul class="rs-list">${n.hemorrhage.map(h=>`<li>${h}</li>`).join('')}</ul>
+    </div>
+    <div class="report-section">
+      <div class="rs-title" style="color:var(--warn-text)"><i class="ti ti-trending-up" style="font-size:14px"></i>How to fix it — generating more leads</div>
+      <ol class="rs-list">${n.leadFixes.map(f=>`<li>${f}</li>`).join('')}</ol>
+    </div>
+    <div class="report-section">
+      <div class="rs-title" style="color:var(--warn-text)"><i class="ti ti-briefcase" style="font-size:14px"></i>How to fix it — converting leads into booked jobs</div>
+      <ol class="rs-list">${n.bookingFixes.map(f=>`<li>${f}</li>`).join('')}</ol>
+    </div>`;
+}
+
+// ── DOCX GENERATION ──────────────────────────────────────────────
+async function generateDocx(){
+  if(!REPORT_DATA){log('No report data — run analysis first','log-err','report-log');return}
+  const btn=document.getElementById('gen-report-btn');
+  btn.disabled=true;btn.innerHTML='<i class="ti ti-loader" style="font-size:16px"></i> Building Word document…';
+  log('Generating printable .docx…','','report-log');
+  try{
+    const doc=buildDocx(REPORT_DATA);
+    const blob=await Packer.toBlob(doc);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download='Marketing360_Health_Report_'+new Date().toISOString().slice(0,10)+'.docx';
+    a.click();URL.revokeObjectURL(url);
+    log('Downloaded successfully','log-ok','report-log');
+    btn.innerHTML='<i class="ti ti-check" style="font-size:16px"></i> Downloaded — run analysis again to regenerate';
+  }catch(e){
+    log('Error: '+e.message,'log-err','report-log');
+    btn.disabled=false;btn.innerHTML='<i class="ti ti-download" style="font-size:16px"></i> Download Printable Word Report (.docx)';
+  }
+}
+
+function buildDocx(d){
+  const {spend,leads,posts,campaigns,booked,target,cpl,cr,leadsScore,postsScore,campScore,cplScore,crScore,overall,narrative,reportDate}=d;
+  const n=narrative;
+
+  function gS(score){return score>=75?'green':score>=45?'yellow':'red'}
+  function sW(s){return s==='green'?'HEALTHY':s==='yellow'?'WEAK':'UNHEALTHY'}
+  const SC={green:'1E6B0A',yellow:'854F0B',red:'8B1A1A'};
+  const SF={green:'D6EDBC',yellow:'FAE5B4',red:'FADCDC'};
+
+  const cb={style:BorderStyle.SINGLE,size:4,color:'CCCCCC'};
+  const cbs={top:cb,bottom:cb,left:cb,right:cb};
+  const nb={style:BorderStyle.NIL,size:0,color:'FFFFFF'};
+  const nbs={top:nb,bottom:nb,left:nb,right:nb};
+
+  function hRule(color='1A3A6B'){return new Paragraph({border:{bottom:{style:BorderStyle.SINGLE,size:6,color,space:1}},spacing:{before:0,after:120},children:[]})}
+  function sHead(text,color='1A3A6B'){return new Paragraph({spacing:{before:220,after:80},children:[new TextRun({text,bold:true,size:24,color,font:'Arial',allCaps:true})]})}
+  function bText(text){return new Paragraph({spacing:{before:40,after:80},children:[new TextRun({text,size:22,font:'Arial'})]})}
+
+  const ovS=gS(overall);
+  const vColor=n.verdict==='YES'?'1E6B0A':'8B1A1A';
+  const vFill=n.verdict==='YES'?'D6EDBC':'FADCDC';
+  const vText=n.verdict==='YES'?'YES — YOUR MARKETING IS PAYING OFF':'NO — YOUR MARKETING IS NOT PAYING OFF';
+
+  return new Document({
+    numbering:{config:[
+      {reference:'bul',levels:[{level:0,format:LevelFormat.BULLET,text:'\u2022',alignment:AlignmentType.LEFT,style:{paragraph:{indent:{left:540,hanging:260}}}}]},
+      {reference:'num',levels:[{level:0,format:LevelFormat.DECIMAL,text:'%1.',alignment:AlignmentType.LEFT,style:{paragraph:{indent:{left:540,hanging:260}}}}]},
+    ]},
+    styles:{default:{document:{run:{font:'Arial',size:22}}}},
+    sections:[{
+      properties:{page:{size:{width:12240,height:15840},margin:{top:1080,right:1080,bottom:1080,left:1080}}},
+      headers:{default:new Header({children:[
+        new Table({width:{size:10080,type:WidthType.DXA},columnWidths:[7080,3000],
+          borders:{top:nb,bottom:{style:BorderStyle.SINGLE,size:6,color:'1A3A6B',space:1},left:nb,right:nb,insideH:nb,insideV:nb},
+          rows:[new TableRow({children:[
+            new TableCell({borders:nbs,width:{size:7080,type:WidthType.DXA},children:[new Paragraph({children:[new TextRun({text:'MARKETING360 HEALTH REPORT',bold:true,size:26,color:'1A3A6B',font:'Arial'})]})]})  ,
+            new TableCell({borders:nbs,width:{size:3000,type:WidthType.DXA},children:[new Paragraph({alignment:AlignmentType.RIGHT,children:[new TextRun({text:reportDate,size:20,color:'888888',font:'Arial'})]})]}),
+          ]})]})
+      ]})},
+      footers:{default:new Footer({children:[new Paragraph({border:{top:{style:BorderStyle.SINGLE,size:4,color:'CCCCCC',space:1}},spacing:{before:80},children:[new TextRun({text:'Confidential — Internal Use Only',size:18,color:'999999',font:'Arial'})]})]})},
+      children:[
+        // Score bar
+        new Table({width:{size:10080,type:WidthType.DXA},columnWidths:[1440,8640],rows:[new TableRow({children:[
+          new TableCell({borders:cbs,width:{size:1440,type:WidthType.DXA},shading:{fill:SF[ovS],type:ShadingType.CLEAR},verticalAlign:VerticalAlign.CENTER,margins:{top:120,bottom:120,left:160,right:120},
+            children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:String(overall),size:72,bold:true,color:SC[ovS],font:'Arial'}),new TextRun({text:'/100',size:28,color:SC[ovS],font:'Arial'})]})]}),
+          new TableCell({borders:cbs,width:{size:8640,type:WidthType.DXA},shading:{fill:SF[ovS],type:ShadingType.CLEAR},verticalAlign:VerticalAlign.CENTER,margins:{top:120,bottom:120,left:200,right:160},
+            children:[
+              new Paragraph({children:[new TextRun({text:'Overall Marketing Health Score',size:20,color:'555555',font:'Arial'})]}),
+              new Paragraph({children:[new TextRun({text:sW(ovS),size:40,bold:true,color:SC[ovS],font:'Arial'})]}),
+              new Paragraph({children:[new TextRun({text:ovS==='green'?'All key areas performing well.':ovS==='yellow'?'Multiple areas need attention before they become costly.':'Critical areas require immediate action to stop budget loss.',size:20,color:'555555',font:'Arial'})]})
+            ]})
+        ]})]})  ,
+        new Paragraph({spacing:{before:160,after:0},children:[]}),
+
+        // Section 1 — Verdict
+        sHead('1.  IS THE MARKETING PAYING OFF?','1A3A6B'),hRule('1A3A6B'),
+        new Table({width:{size:10080,type:WidthType.DXA},columnWidths:[10080],rows:[new TableRow({children:[
+          new TableCell({borders:cbs,width:{size:10080,type:WidthType.DXA},shading:{fill:vFill,type:ShadingType.CLEAR},margins:{top:140,bottom:140,left:200,right:200},
+            children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:vText,size:32,bold:true,color:vColor,font:'Arial'})]})]})]})]}),
+        new Paragraph({spacing:{before:100,after:60},children:[new TextRun({text:'WHY:',bold:true,size:22,font:'Arial',color:'333333'})]}),
+        bText(n.verdictReason),
+        new Paragraph({spacing:{before:160,after:0},children:[]}),
+
+        // Section 2 — Numbers
+        sHead('2.  NUMBERS AT A GLANCE','1A3A6B'),hRule('1A3A6B'),
+        new Table({width:{size:10080,type:WidthType.DXA},columnWidths:[3600,2160,1800,2520],rows:[
+          new TableRow({tableHeader:true,children:[
+            new TableCell({borders:cbs,width:{size:3600,type:WidthType.DXA},shading:{fill:'1A3A6B',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:160,right:120},children:[new Paragraph({children:[new TextRun({text:'METRIC',size:20,bold:true,color:'FFFFFF',font:'Arial'})]})]})  ,
+            new TableCell({borders:cbs,width:{size:2160,type:WidthType.DXA},shading:{fill:'1A3A6B',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'VALUE',size:20,bold:true,color:'FFFFFF',font:'Arial'})]})]})  ,
+            new TableCell({borders:cbs,width:{size:1800,type:WidthType.DXA},shading:{fill:'1A3A6B',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'STATUS',size:20,bold:true,color:'FFFFFF',font:'Arial'})]})]})  ,
+            new TableCell({borders:cbs,width:{size:2520,type:WidthType.DXA},shading:{fill:'1A3A6B',type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:160},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'TARGET',size:20,bold:true,color:'FFFFFF',font:'Arial'})]})]}),
+          ]}),
+          ...[
+            ['Monthly Ad Spend','$'+spend.toLocaleString(),cplScore,'CPL under $120'],
+            ['Cost Per Lead (CPL)','$'+Math.round(cpl),cplScore,'$120 or below'],
+            ['Leads This Month',String(leads),leadsScore,target+' per month'],
+            ['Social Posts',String(posts),postsScore,'20 per month'],
+            ['Active Campaigns',String(campaigns),campScore,'4 campaigns'],
+            ['Booked Projects',String(booked),crScore,'25%+ close rate'],
+            ['Lead-to-Booking Rate',cr.toFixed(1)+'%',crScore,'25% or higher'],
+          ].map(([label,val,score,tgt])=>{
+            const s=gS(score);
+            return new TableRow({children:[
+              new TableCell({borders:cbs,width:{size:3600,type:WidthType.DXA},margins:{top:80,bottom:80,left:160,right:120},children:[new Paragraph({children:[new TextRun({text:label,size:20,font:'Arial'})]})]}),
+              new TableCell({borders:cbs,width:{size:2160,type:WidthType.DXA},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:val,size:20,bold:true,font:'Arial'})]})]})  ,
+              new TableCell({borders:cbs,width:{size:1800,type:WidthType.DXA},shading:{fill:SF[s],type:ShadingType.CLEAR},margins:{top:80,bottom:80,left:120,right:120},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:sW(s),size:18,bold:true,color:SC[s],font:'Arial'})]})]}),
+              new TableCell({borders:cbs,width:{size:2520,type:WidthType.DXA},margins:{top:80,bottom:80,left:120,right:160},children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:tgt,size:20,color:'555555',font:'Arial'})]})]}),
+            ]})
+          })
+        ]}),
+        new Paragraph({spacing:{before:180,after:0},children:[]}),
+
+        // Section 3 — Who What Where When
+        sHead('3.  WHO, WHAT, WHERE & WHEN','1A3A6B'),hRule('1A3A6B'),
+        bText(n.whoWhatWhere),
+        new Paragraph({spacing:{before:180,after:0},children:[]}),
+
+        // Section 4 — Money hemorrhage
+        sHead('4.  WHERE THE MONEY IS BEING LOST','A32D2D'),hRule('A32D2D'),
+        bText('The following issues are the direct cause of budget being spent without a return in leads or booked jobs:'),
+        new Paragraph({spacing:{before:60,after:0},children:[]}),
+        ...n.hemorrhage.map(h=>new Paragraph({numbering:{reference:'bul',level:0},spacing:{before:20,after:40},children:[new TextRun({text:h,size:22,font:'Arial'})]})),
+        new Paragraph({spacing:{before:180,after:0},children:[]}),
+
+        // Section 5 — Lead fixes
+        sHead('5.  HOW TO FIX IT — GENERATING MORE LEADS','854F0B'),hRule('854F0B'),
+        bText('Take these steps immediately to increase the number of leads coming in:'),
+        new Paragraph({spacing:{before:60,after:0},children:[]}),
+        ...n.leadFixes.map(f=>new Paragraph({numbering:{reference:'num',level:0},spacing:{before:40,after:60},children:[new TextRun({text:f,size:22,font:'Arial'})]})),
+        new Paragraph({spacing:{before:180,after:0},children:[]}),
+
+        // Section 6 — Booking fixes
+        sHead('6.  HOW TO FIX IT — CONVERTING LEADS INTO BOOKED JOBS','854F0B'),hRule('854F0B'),
+        bText('Take these steps to convert more of your existing leads into signed, paying projects:'),
+        new Paragraph({spacing:{before:60,after:0},children:[]}),
+        ...n.bookingFixes.map(f=>new Paragraph({numbering:{reference:'num',level:0},spacing:{before:40,after:60},children:[new TextRun({text:f,size:22,font:'Arial'})]})),
+        new Paragraph({spacing:{before:180,after:0},children:[]}),
+
+        // Footer note
+        new Paragraph({border:{top:{style:BorderStyle.SINGLE,size:4,color:'CCCCCC',space:1}},spacing:{before:100,after:0},
+          children:[new TextRun({text:'Auto-generated from Marketing360 portal data. Verify figures against your live account before acting. Generated: '+reportDate,size:16,color:'999999',font:'Arial',italics:true})]})
+      ]
+    }]
+  });
+}
+
+function setNavStatus(text,type){
+  const el=document.getElementById('nav-status');el.textContent=text;
+  const types={info:'info',success:'success',warn:'warn'};const t=types[type]||'success';
+  el.style.background=`var(--${t}-bg)`;el.style.color=`var(--${t}-text)`;el.style.borderColor=`var(--${t}-border)`;
+}
+
+function copyReport(){
+  const m=calcMetrics();
+  const v=REPORT_DATA?.narrative?.verdict;
+  const lines=[
+    'Marketing360 Health Report — '+new Date().toLocaleDateString(),
+    '─────────────────────────────────────────',
+    `Overall score: ${m.overall}/100`,
+    v?`Verdict: ${v==='YES'?'YES — marketing is paying off':'NO — marketing is NOT paying off'}` : '',
+    `Monthly spend: $${m.spend.toLocaleString()} | CPL: $${Math.round(m.cpl)}`,
+    `Leads: ${m.leads}/${m.target} target | Booking rate: ${m.cr.toFixed(1)}%`,
+    `Social posts: ${m.posts}/mo | Active campaigns: ${m.campaigns}`,
+  ].filter(Boolean);
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>alert('Summary copied to clipboard!'));
+}
+
+function resetAll(){
+  FILES.length=0;EX={spend:null,leads:null,posts:null,campaigns:null,booked:null,target:60};SRC={};REPORT_DATA=null;
+  document.getElementById('file-list').innerHTML='';
+  ['log-box','report-log'].forEach(id=>{const b=document.getElementById(id);if(b){b.innerHTML='';b.style.display='none'}});
+  document.getElementById('analyze-btn').disabled=true;
+  document.getElementById('analyze-btn').innerHTML='<i class="ti ti-brain" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>Analyze files &amp; generate health dashboard';
+  document.getElementById('results-section').classList.add('hidden');
+  document.getElementById('file-input').value='';
+  setNavStatus('Ready','success');
+  setStep(1);window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>

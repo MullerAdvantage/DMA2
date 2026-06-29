@@ -1,0 +1,20 @@
+============================================================
+MARKETING PERFORMANCE REPORT
+Period: Jan 2026 - Jun 2026
+============================================================
+
+KEY METRICS
+Impressions: 153,600
+Clicks: 3,910
+CTR: 2.55%
+Total Leads: 243
+Cost: $10,090.00
+Cost/Lead: $41.52
+Revenue: $130,000.00
+ROAS: 12.88x
+Conversion Rate: 2.25%
+
+INSIGHTS
+- Preserve high-performing spend; blended ROAS is 12.88x.
+- Use $41.52 CPL as the optimization baseline.
+- Audit landing pages and lead follow-up because conversion rate is below 3%.

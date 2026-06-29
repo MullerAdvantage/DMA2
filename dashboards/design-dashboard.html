@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Demo Studio — Complete Pitch Tool</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --gold: #d4af37;
+            --silver: #c0c0c0;
+            --black: #000000;
+            --dark: #0a0a0a;
+            --gray: #1a1a1a;
+            --light-gray: #2a2a2a;
+            --white: #ffffff;
+        }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--black);
+            color: var(--white);
+            overflow: hidden;
+        }
+        
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--dark), var(--gray));
+            border-bottom: 3px solid var(--gold);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            z-index: 50;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--gold), var(--silver));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .mode-indicator {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid var(--gold);
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            color: var(--gold);
+        }
+        
+        .keyboard-shortcut {
+            background: rgba(192, 192, 192, 0.1);
+            border: 1px solid var(--silver);
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            color: var(--silver);
+        }
+        
+        /* MAIN CONTENT AREA */
+        .content {
+            display: grid;
+            grid-template-columns: 300px 1fr 280px;
+            gap: 0;
+            height: calc(100vh - 70px);
+            position: relative;
+        }
+        
+        /* CONTROL PANEL */
+        .control-panel {
+            background: var(--gray);
+            border-right: 2px solid var(--light-gray);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .control-panel h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--silver);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-gray);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--white);
+            border-radius: 0.25rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* PREVIEW PANEL */
+        .preview-panel {
+            background: var(--black);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .preview-header {
+            background: var(--gray);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--light-gray);
+            color: var(--silver);
+            font-size: 0.9rem;
+        }
+        
+        .preview-frame {
+            width: 100%;
+            height: calc(100vh - 140px);
+            background: var(--black);
+            border: none;
+            overflow: auto;
+        }
+        
+        /* TEMPLATE PANEL */
+        .template-panel {
+            background: var(--gray);
+            border-left: 2px solid var(--light-gray);
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .template-panel h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .template-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .template-btn {
+            padding: 1rem;
+            border: 2px solid var(--light-gray);
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--white);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+        
+        .template-btn:hover {
+            border-color: var(--silver);
+            background: rgba(192, 192, 192, 0.1);
+        }
+        
+        .template-btn.active {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+        
+        .template-description {
+            font-size: 0.75rem;
+            color: var(--silver);
+            margin-top: 0.5rem;
+        }
+        
+        /* PRICING SCREEN (Modal-style overlay) */
+        .pricing-modal {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--black);
+            z-index: 1000;
+            display: none;
+            overflow-y: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        
+        .pricing-modal.active {
+            display: block;
+            opacity: 1;
+        }
+        
+        .pricing-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .pricing-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold), var(--silver));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .pricing-header p {
+            color: var(--silver);
+            font-size: 1.1rem;
+        }
+        
+        .pricing-tabs {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .pricing-tab-btn {
+            padding: 0.8rem 1.5rem;
+            border: 2px solid var(--light-gray);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--white);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        
+        .pricing-tab-btn:hover {
+            border-color: var(--gold);
+        }
+        
+        .pricing-tab-btn.active {
+            background: var(--gold);
+            color: var(--black);
+            border-color: var(--gold);
+        }
+        
+        .pricing-tab-content {
+            display: none;
+        }
+        
+        .pricing-tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .comparison-table {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(42, 42, 42, 0.9));
+            border: 1px solid var(--light-gray);
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 3rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, var(--gold) 0%, #c9a227 100%);
+            color: #000;
+            padding: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        th:first-child {
+            text-align: left;
+            background: linear-gradient(135deg, var(--light-gray), var(--gray));
+            color: var(--gold);
+        }
+        
+        td {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--light-gray);
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        
+        td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--silver);
+            background: rgba(0, 0, 0, 0.3);
+            border-right: 1px solid var(--light-gray);
+        }
+        
+        .price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        
+        .check {
+            color: #4ade80;
+            font-weight: bold;
+        }
+        
+        .x {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .pricing-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.95));
+            border: 2px solid var(--light-gray);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .pricing-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.15);
+        }
+        
+        .pricing-card.featured {
+            border: 3px solid var(--gold);
+            background: linear-gradient(135deg, rgba(32, 32, 32, 0.98), rgba(50, 50, 50, 0.98));
+            transform: scale(1.05);
+        }
+        
+        .card-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: var(--gold);
+            color: #000;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0 0 0.5rem 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--white);
+            font-weight: 700;
+        }
+        
+        .card-price {
+            font-size: 2.5rem;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-duration {
+            color: var(--silver);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        
+        .card-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .card-features li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--light-gray);
+            font-size: 0.95rem;
+        }
+        
+        .card-features li:last-child {
+            border-bottom: none;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--black);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--silver);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Design Demo Studio</h1>
+        <div class="header-controls">
+            <div class="mode-indicator" id="modeIndicator">Live Demo</div>
+            <div class="keyboard-shortcut">Press <strong>N</strong> for Pricing</div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div class="content">
+        <!-- LEFT: CONTROL PANEL -->
+        <div class="control-panel">
+            <h2>Business Info</h2>
+            
+            <div class="form-group">
+                <label>Business Name</label>
+                <input type="text" id="businessName" placeholder="Enter client business name" value="Your Business Here">
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="businessDesc" placeholder="Enter business description">Professional services and solutions for modern businesses.</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" id="businessPhone" placeholder="(555) 123-4567" value="(555) 123-4567">
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="businessEmail" placeholder="info@business.com" value="info@business.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="businessAddress" placeholder="City, State" value="Seattle, WA">
+            </div>
+            
+            <div class="form-group">
+                <label>CTA Text</label>
+                <input type="text" id="ctaText" placeholder="Get Started" value="Get Started Today">
+            </div>
+            
+            <hr style="border: 1px solid var(--light-gray); margin: 2rem 0;">
+            
+            <p style="font-size: 0.8rem; color: var(--silver); line-height: 1.6;">
+                ✅ <strong>Edit left:</strong> Updates live<br>
+                ✅ <strong>Click right:</strong> Switch themes<br>
+                ✅ <strong>Press N:</strong> Show pricing
+            </p>
+        </div>
+
+        <!-- CENTER: PREVIEW -->
+        <div class="preview-panel">
+            <div class="preview-header">
+                Preview: <span id="activeTemplate">Theme 1 — Minimalist</span>
+            </div>
+            <div id="preview" class="preview-frame"></div>
+        </div>
+
+        <!-- RIGHT: TEMPLATE SELECTOR -->
+        <div class="template-panel">
+            <h2>Design Themes</h2>
+            <div class="template-selector">
+                <button class="template-btn active" data-template="1">
+                    Theme 1
+                    <div class="template-description">Minimalist Clean</div>
+                </button>
+                <button class="template-btn" data-template="2">
+                    Theme 2
+                    <div class="template-description">Professional Elegant</div>
+                </button>
+                <button class="template-btn" data-template="3">
+                    Theme 3
+                    <div class="template-description">Premium Luxury</div>
+                </button>
+                <button class="template-btn" data-template="4">
+                    Theme 4
+                    <div class="template-description">Bold Modern</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRICING MODAL (Separate screen) -->
+    <div id="pricingModal" class="pricing-modal">
+        <div class="pricing-container">
+            <div class="pricing-header">
+                <h1>Pricing Plans</h1>
+                <p>Choose the perfect plan for your business</p>
+            </div>
+            
+            <div class="pricing-tabs">
+                <button class="pricing-tab-btn active" onclick="showPricingTab('table')">Table</button>
+                <button class="pricing-tab-btn" onclick="showPricingTab('cards')">Cards</button>
+            </div>
+            
+            <!-- TABLE VIEW -->
+            <div id="table" class="pricing-tab-content active">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>FOUNDATIONS<br><span class="price">$2,500</span></th>
+                                <th>PROFESSIONAL<br><span class="price">$5,000</span></th>
+                                <th>UNLIMITED<br><span class="price">$15K-50K+</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Timeline</td>
+                                <td>2-3 weeks</td>
+                                <td>4-5 weeks</td>
+                                <td>6-12 weeks</td>
+                            </tr>
+                            <tr>
+                                <td>Pages</td>
+                                <td>5</td>
+                                <td>10+</td>
+                                <td>Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>Animations</td>
+                                <td>Basic</td>
+                                <td>Advanced</td>
+                                <td>Custom</td>
+                            </tr>
+                            <tr>
+                                <td>Email Automation</td>
+                                <td>Basic setup</td>
+                                <td>Full sequences</td>
+                                <td>Advanced + CRM</td>
+                            </tr>
+                            <tr>
+                                <td>AI Content</td>
+                                <td><span class="x">✗</span></td>
+                                <td><span class="check">✓</span></td>
+                                <td><span class="check">✓ Advanced</span></td>
+                            </tr>
+                            <tr>
+                                <td>E-Commerce</td>
+                                <td><span class="x">✗</span></td>
+                                <td><span class="x">✗</span></td>
+                                <td><span class="check">✓</span></td>
+                            </tr>
+                            <tr>
+                                <td>CRM Integration</td>
+                                <td><span class="x">✗</span></td>
+                                <td><span class="x">✗</span></td>
+                                <td><span class="check">✓</span></td>
+                            </tr>
+                            <tr>
+                                <td>Support</td>
+                                <td>None</td>
+                                <td>30 days</td>
+                                <td>Ongoing</td>
+                            </tr>
+                            <tr>
+                                <td>Revisions</td>
+                                <td>1 round</td>
+                                <td>2 rounds</td>
+                                <td>Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>White-Label</td>
+                                <td><span class="x">✗</span></td>
+                                <td><span class="x">✗</span></td>
+                                <td><span class="check">✓</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- CARD VIEW -->
+            <div id="cards" class="pricing-tab-content">
+                <div class="card-grid">
+                    <div class="pricing-card">
+                        <div class="card-title">Foundations</div>
+                        <div class="card-price">$2,500</div>
+                        <div class="card-duration">2-3 weeks • 5 pages</div>
+                        <ul class="card-features">
+                            <li><span class="check">✓</span> 5 Pages</li>
+                            <li><span class="check">✓</span> Basic Animations</li>
+                            <li><span class="check">✓</span> Basic Email Setup</li>
+                            <li><span class="x">✗</span> No AI Content</li>
+                            <li><span class="x">✗</span> No E-Commerce</li>
+                            <li><span class="x">✗</span> No CRM</li>
+                            <li><span class="x">✗</span> No Support</li>
+                            <li><span class="check">✓</span> 1 Revision Round</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pricing-card featured">
+                        <div class="card-badge">Most Popular</div>
+                        <div class="card-title">Professional</div>
+                        <div class="card-price">$5,000</div>
+                        <div class="card-duration">4-5 weeks • 10+ pages</div>
+                        <ul class="card-features">
+                            <li><span class="check">✓</span> 10+ Pages</li>
+                            <li><span class="check">✓</span> Advanced Animations</li>
+                            <li><span class="check">✓</span> Full Email Sequences</li>
+                            <li><span class="check">✓</span> AI Content</li>
+                            <li><span class="x">✗</span> No E-Commerce</li>
+                            <li><span class="x">✗</span> No CRM</li>
+                            <li><span class="check">✓</span> 30 Days Support</li>
+                            <li><span class="check">✓</span> 2 Revision Rounds</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pricing-card">
+                        <div class="card-badge">Enterprise</div>
+                        <div class="card-title">Unlimited</div>
+                        <div class="card-price">$15K-50K+</div>
+                        <div class="card-duration">6-12 weeks • Unlimited</div>
+                        <ul class="card-features">
+                            <li><span class="check">✓</span> Unlimited Pages</li>
+                            <li><span class="check">✓</span> Custom Animations</li>
+                            <li><span class="check">✓</span> Advanced Email + CRM</li>
+                            <li><span class="check">✓</span> Advanced AI Content</li>
+                            <li><span class="check">✓</span> E-Commerce</li>
+                            <li><span class="check">✓</span> CRM Integration</li>
+                            <li><span class="check">✓</span> Ongoing Support</li>
+                            <li><span class="check">✓</span> Unlimited Revisions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTemplate = '1';
+        
+        // Get template HTML with 4 distinct designs
+        function getTemplateHTML(template) {
+            const name = document.getElementById('businessName').value || 'Your Business';
+            const desc = document.getElementById('businessDesc').value || 'Professional services';
+            const phone = document.getElementById('businessPhone').value || '(555) 123-4567';
+            const email = document.getElementById('businessEmail').value || 'info@business.com';
+            const address = document.getElementById('businessAddress').value || 'City, State';
+            const cta = document.getElementById('ctaText').value || 'Get Started';
+            
+            const templates = {
+                '1': `<!DOCTYPE html><html><head><style>* { margin: 0; padding: 0; box-sizing: border-box; }body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f0f2f5 0%, #ffffff 100%); color: #1f2937; }header { background: #ffffff; padding: 2rem; text-align: center; border-bottom: 1px solid #e5e7eb; }h1 { font-size: 2.5rem; font-weight: 300; color: #1f2937; }h2 { font-size: 2.2rem; font-weight: 300; color: #374151; }.hero { padding: 5rem 2rem; text-align: center; background: linear-gradient(135deg, #f9fafb, #ffffff); }.hero p { font-size: 1.1rem; color: #6b7280; margin-bottom: 2rem; }.cta { background: #1f2937; color: #fff; padding: 1rem 2rem; text-decoration: none; display: inline-block; font-weight: 600; border-radius: 0.5rem; transition: all 0.3s; }.cta:hover { background: #111827; transform: scale(1.05); }.services { padding: 4rem 2rem; background: #fafbfc; }.services h3 { text-align: center; font-size: 2rem; color: #1f2937; margin-bottom: 3rem; }.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 1200px; margin: 0 auto; }.card { padding: 2rem; background: #fff; border-radius: 0.5rem; border-left: 4px solid #3b82f6; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }.card h4 { color: #1f2937; margin-bottom: 1rem; font-size: 1.2rem; }.card p { color: #6b7280; }.footer { background: #1f2937; color: #fff; padding: 3rem 2rem; text-align: center; }</style></head><body><header><h1>${name}</h1><p style="color: #6b7280;">${desc}</p></header><div class="hero"><h2>Clean. Simple. Effective.</h2><p>${desc}</p><a href="#" class="cta">${cta}</a></div><div class="services"><h3>What We Offer</h3><div class="grid"><div class="card"><h4>Strategy</h4><p>Custom strategies tailored to your business goals.</p></div><div class="card"><h4>Design</h4><p>Beautiful, functional designs that convert visitors.</p></div><div class="card"><h4>Support</h4><p>Ongoing support and optimization.</p></div></div></div><footer><h4>${name}</h4><p>📍 ${address}</p><p>📞 ${phone}</p><p>✉️ ${email}</p></footer></body></html>`,
+                '2': `<!DOCTYPE html><html><head><style>* { margin: 0; padding: 0; box-sizing: border-box; }body { font-family: Georgia, serif; background: #fafaf8; color: #2c2c2c; }header { background: linear-gradient(135deg, #2c2c2c, #1a1a1a); color: #fff; padding: 4rem 2rem; text-align: center; border-bottom: 3px solid #d4af37; }h1 { font-size: 3.5rem; font-weight: 400; letter-spacing: 3px; color: #d4af37; }h2 { font-size: 2.8rem; font-weight: 400; letter-spacing: 2px; color: #d4af37; }.hero { padding: 6rem 2rem; text-align: center; background: #ffffff; }.hero p { font-size: 1.2rem; color: #2c2c2c; margin-bottom: 2rem; letter-spacing: 0.5px; }.cta { background: #d4af37; color: #000; padding: 1.2rem 3rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; border-radius: 0.25rem; transition: all 0.3s; text-decoration: none; display: inline-block; }.cta:hover { background: #c9a227; transform: scale(1.05); }.services { padding: 6rem 2rem; background: #fafaf8; }.services h3 { font-size: 2.8rem; font-weight: 400; color: #d4af37; text-align: center; margin-bottom: 4rem; letter-spacing: 2px; }.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; max-width: 1200px; margin: 0 auto; }.card { padding: 3rem 2rem; text-align: center; background: #ffffff; border-top: 4px solid #d4af37; }.card h4 { font-size: 1.4rem; color: #d4af37; margin-bottom: 1rem; letter-spacing: 1px; }.card p { color: #2c2c2c; line-height: 1.8; }.footer { background: linear-gradient(135deg, #1a1a1a, #0a0a0a); color: #fff; padding: 4rem 2rem; border-top: 3px solid #d4af37; text-align: center; }.footer h4 { font-size: 2rem; color: #d4af37; letter-spacing: 2px; margin-bottom: 1rem; }</style></head><body><header><h1>${name}</h1><p style="color: #d4af37; letter-spacing: 1px;">${desc}</p></header><div class="hero"><h2>Elegant. Professional. Premium.</h2><p>${desc}</p><a href="#" class="cta">${cta}</a></div><div class="services"><h3>Premium Services</h3><div class="grid"><div class="card"><h4>Strategy</h4><p>Bespoke strategies crafted for your vision and goals.</p></div><div class="card"><h4>Design</h4><p>Premium aesthetics that command attention and trust.</p></div><div class="card"><h4>Excellence</h4><p>Seamless execution and dedicated support always.</p></div></div></div><footer><h4>${name}</h4><p>📍 ${address}</p><p>📞 ${phone}</p><p>✉️ ${email}</p></footer></body></html>`,
+                '3': `<!DOCTYPE html><html><head><style>* { margin: 0; padding: 0; box-sizing: border-box; }body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; }header { background: linear-gradient(135deg, #1a1a1a, #0a0a0a); border-bottom: 4px solid #d4af37; padding: 4rem 2rem; text-align: center; }h1 { font-size: 3.8rem; font-weight: 700; letter-spacing: 3px; background: linear-gradient(135deg, #d4af37, #c0c0c0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }h2 { font-size: 3.2rem; background: linear-gradient(135deg, #d4af37, #c0c0c0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 2px; }.hero { padding: 7rem 2rem; text-align: center; background: radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.15), transparent 60%); }.hero p { font-size: 1.3rem; color: #c0c0c0; margin-bottom: 2rem; letter-spacing: 1px; }.cta { background: #d4af37; color: #000; padding: 1.3rem 3.5rem; font-weight: 700; text-transform: uppercase; border-radius: 0.75rem; transition: all 0.3s; text-decoration: none; display: inline-block; letter-spacing: 2px; }.cta:hover { background: #fff; transform: scale(1.05); box-shadow: 0 20px 40px rgba(212, 175, 55, 0.3); }.services { padding: 7rem 2rem; }.services h3 { font-size: 3rem; text-align: center; background: linear-gradient(135deg, #d4af37, #c0c0c0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4rem; letter-spacing: 2px; }.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; max-width: 1200px; margin: 0 auto; }.card { padding: 3rem; background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(42, 42, 42, 0.95)); border: 2px solid rgba(212, 175, 55, 0.4); border-radius: 0.75rem; transition: all 0.3s; }.card:hover { border-color: #d4af37; box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2); }.card h4 { font-size: 1.6rem; color: #d4af37; margin-bottom: 1rem; letter-spacing: 1px; }.card p { color: #c0c0c0; line-height: 1.8; font-size: 1.05rem; }.footer { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border-top: 2px solid #d4af37; padding: 4rem 2rem; text-align: center; }.footer h4 { font-size: 2.2rem; color: #d4af37; letter-spacing: 2px; margin-bottom: 1.5rem; }.footer p { color: #c0c0c0; }</style></head><body><header><h1>${name}</h1><p style="color: #c0c0c0; letter-spacing: 1px;">${desc}</p></header><div class="hero"><h2>Exclusive. Premium. Bespoke.</h2><p>${desc}</p><a href="#" class="cta">${cta}</a></div><div class="services"><h3>Elite Services</h3><div class="grid"><div class="card"><h4>✨ Luxury Design</h4><p>Premium aesthetics that maximize impact and prestige.</p></div><div class="card"><h4>💎 Bespoke Strategy</h4><p>Custom approaches engineered for your market segment.</p></div><div class="card"><h4>🏆 Concierge Support</h4><p>White-glove service with dedicated expert partners.</p></div></div></div><footer><h4>${name}</h4><p>📍 ${address}</p><p>📞 ${phone}</p><p>✉️ ${email}</p></footer></body></html>`,
+                '4': `<!DOCTYPE html><html><head><style>* { margin: 0; padding: 0; box-sizing: border-box; }body { font-family: Arial, sans-serif; background: #fff; color: #000; }header { background: linear-gradient(135deg, #FF6B35 0%, #004E89 100%); color: #fff; padding: 4rem 2rem; text-align: center; box-shadow: 0 10px 30px rgba(0,78,137,0.3); }h1 { font-size: 4rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }.header-p { color: #fff; font-size: 1.2rem; letter-spacing: 1px; }h2 { font-size: 3.5rem; color: #004E89; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }.hero { padding: 7rem 2rem; text-align: center; background: linear-gradient(135deg, #f5f5f5 0%, #fff 100%); }.hero p { font-size: 1.3rem; color: #333; margin-bottom: 2rem; font-weight: 500; }.cta { background: #FF6B35; color: #fff; padding: 1.5rem 3.5rem; font-weight: 900; text-transform: uppercase; border-radius: 1rem; transition: all 0.3s; text-decoration: none; display: inline-block; letter-spacing: 2px; box-shadow: 0 8px 20px rgba(255,107,53,0.3); }.cta:hover { background: #E85A25; transform: scale(1.08); box-shadow: 0 12px 30px rgba(255,107,53,0.5); }.services { padding: 7rem 2rem; background: #fff; }.services h3 { font-size: 3.2rem; font-weight: 900; color: #1a1a1a; text-align: center; margin-bottom: 4rem; text-transform: uppercase; letter-spacing: 2px; }.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; max-width: 1200px; margin: 0 auto; }.card { padding: 3.5rem 2.5rem; border-radius: 1rem; color: #fff; font-weight: 600; text-align: center; transition: all 0.3s; }.card:nth-child(1) { background: linear-gradient(135deg, #FF6B35, #FF8C42); }.card:nth-child(2) { background: linear-gradient(135deg, #004E89, #0075C4); }.card:nth-child(3) { background: linear-gradient(135deg, #6A4C93, #8E7ABE); }.card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }.card h4 { font-size: 1.8rem; font-weight: 900; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }.card p { font-size: 1.1rem; line-height: 1.8; }.footer { background: linear-gradient(135deg, #1a1a1a, #000); color: #fff; padding: 5rem 2rem; text-align: center; }.footer h4 { font-size: 2.5rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.5rem; color: #FF6B35; }.footer p { font-size: 1.1rem; margin-bottom: 0.5rem; }</style></head><body><header><h1>${name}</h1><p class="header-p">${desc}</p></header><div class="hero"><h2>Bold. Vibrant. Results.</h2><p>${desc}</p><a href="#" class="cta">${cta}</a></div><div class="services"><h3>Next-Level Capabilities</h3><div class="grid"><div class="card"><h4>🚀 Lightning Fast</h4><p>Results in weeks, not months. Rapid deployment.</p></div><div class="card"><h4>💪 Powerhouse</h4><p>Bold strategies that dominate your market space.</p></div><div class="card"><h4>🎯 Laser Focused</h4><p>Precision targeting on your ideal customers always.</p></div></div></div><footer><h4>${name}</h4><p>📍 ${address}</p><p>📞 ${phone}</p><p>✉️ ${email}</p></footer></body></html>`
+            };
+            
+            return templates[template] || templates['1'];
+        }
+        
+        // Update preview
+        function updatePreview() {
+            const html = getTemplateHTML(currentTemplate);
+            document.getElementById('preview').innerHTML = html;
+        }
+        
+        // Template names
+        const templateNames = {
+            '1': 'Theme 1 — Minimalist',
+            '2': 'Theme 2 — Professional',
+            '3': 'Theme 3 — Premium',
+            '4': 'Theme 4 — Bold'
+        };
+        
+        // Handle template switching
+        document.querySelectorAll('.template-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentTemplate = this.dataset.template;
+                document.getElementById('activeTemplate').textContent = templateNames[currentTemplate];
+                updatePreview();
+            });
+        });
+        
+        // Handle input changes
+        document.querySelectorAll('input, textarea').forEach(el => {
+            el.addEventListener('input', updatePreview);
+        });
+        
+        // Pricing tab switching
+        function showPricingTab(tabName) {
+            document.querySelectorAll('.pricing-tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.pricing-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // KEYBOARD SHORTCUT: Press N to toggle between Dashboard and Pricing
+        document.addEventListener('keydown', function(e) {
+            if (e.key.toLowerCase() === 'n') {
+                e.preventDefault();
+                const pricingModal = document.getElementById('pricingModal');
+                const modeIndicator = document.getElementById('modeIndicator');
+                
+                pricingModal.classList.toggle('active');
+                
+                if (pricingModal.classList.contains('active')) {
+                    modeIndicator.textContent = 'Pricing Comparison';
+                } else {
+                    modeIndicator.textContent = 'Live Demo';
+                }
+            }
+        });
+        
+        // Initial preview
+        updatePreview();
+    </script>
+</body>
+</html>

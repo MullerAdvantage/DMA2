@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Token Optimization Workflow Launcher</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0a0c;
+    --surface: #111115;
+    --surface2: #18181f;
+    --border: #222230;
+    --border2: #2e2e40;
+    --text: #e8e8f0;
+    --muted: #666680;
+    --subtle: #333348;
+    --accent-blue: #4f8ef7;
+    --accent-green: #3ecf8e;
+    --accent-amber: #f5a623;
+    --accent-purple: #a78bfa;
+    --accent-red: #f87171;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  .header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .header .badge {
+    font-size: 10px;
+    font-family: var(--font-mono);
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Phase tabs */
+  .phase-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .phase-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .phase-tab:hover { border-color: var(--border2); color: var(--text); }
+
+  .phase-tab.active {
+    color: var(--text);
+    border-color: var(--accent-blue);
+    background: rgba(79,142,247,0.08);
+  }
+
+  .phase-tab .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Main layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  /* Left panel */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .field-group {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  .field input,
+  .field textarea,
+  .field select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text);
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+
+  .field input:focus,
+  .field textarea:focus,
+  .field select:focus {
+    border-color: var(--accent-blue);
+  }
+
+  .field select option { background: var(--surface2); }
+
+  /* Generate button */
+  .btn-generate {
+    width: 100%;
+    margin: 0 14px 14px;
+    width: calc(100% - 28px);
+    padding: 10px;
+    border-radius: 7px;
+    border: none;
+    background: var(--accent-blue);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .btn-generate:hover { opacity: 0.9; }
+  .btn-generate:active { transform: scale(0.98); }
+  .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Right panel - output */
+  .output-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .output-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .status-dot.active { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+  .status-dot.thinking {
+    background: var(--accent-amber);
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .btn-copy {
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-copy:hover { color: var(--text); border-color: var(--text); }
+
+  .output-body {
+    flex: 1;
+    padding: 16px;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-y: auto;
+    min-height: 360px;
+  }
+
+  .output-body.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--subtle);
+    font-size: 13px;
+  }
+
+  .empty-icon { font-size: 28px; }
+
+  /* Streaming cursor */
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--accent-blue);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 0.8s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Phase-specific accent colors */
+  .phase-1 { --phase-color: var(--accent-blue); }
+  .phase-2 { --phase-color: var(--accent-purple); }
+  .phase-3 { --phase-color: var(--accent-green); }
+  .phase-4 { --phase-color: var(--accent-amber); }
+  .phase-5 { --phase-color: var(--accent-red); }
+
+  .btn-generate.phase-1 { background: var(--accent-blue); }
+  .btn-generate.phase-2 { background: var(--accent-purple); }
+  .btn-generate.phase-3 { background: var(--accent-green); color: #0a0a0c; }
+  .btn-generate.phase-4 { background: var(--accent-amber); color: #0a0a0c; }
+  .btn-generate.phase-5 { background: var(--accent-red); }
+
+  /* Token meter */
+  .token-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .token-bar-wrap {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .token-bar {
+    height: 100%;
+    background: var(--accent-green);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  /* Open-in buttons */
+  .open-strip {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .btn-open {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .btn-open:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Workflow Launcher</h1>
+  <span class="badge">Token Optimized</span>
+</div>
+
+<!-- Phase tabs -->
+<div class="phase-tabs" id="phaseTabs">
+  <button class="phase-tab active phase-1" data-phase="1" onclick="selectPhase(1)">
+    <span class="dot" style="background:#4f8ef7"></span> 01 Brief
+  </button>
+  <button class="phase-tab phase-2" data-phase="2" onclick="selectPhase(2)">
+    <span class="dot" style="background:#a78bfa"></span> 02 Pomelli Prompts
+  </button>
+  <button class="phase-tab phase-3" data-phase="3" onclick="selectPhase(3)">
+    <span class="dot" style="background:#3ecf8e"></span> 03 Dashboard
+  </button>
+  <button class="phase-tab phase-4" data-phase="4" onclick="selectPhase(4)">
+    <span class="dot" style="background:#f5a623"></span> 04 Code
+  </button>
+  <button class="phase-tab phase-5" data-phase="5" onclick="selectPhase(5)">
+    <span class="dot" style="background:#f87171"></span> 05 Handoff
+  </button>
+</div>
+
+<div class="layout">
+
+  <!-- Left: inputs -->
+  <div class="panel" id="inputPanel">
+    <div class="panel-header" id="panelTitle">Phase 01 — Brief + Prompts</div>
+    <div class="field-group" id="fieldGroup">
+      <!-- Dynamically rendered -->
+    </div>
+    <button class="btn-generate phase-1" id="btnGenerate" onclick="generate()">
+      ⚡ Generate
+    </button>
+  </div>
+
+  <!-- Right: output -->
+  <div class="output-panel">
+    <div class="output-header">
+      <div class="output-label">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="outputLabel">Waiting for input</span>
+      </div>
+      <button class="btn-copy" onclick="copyOutput()">Copy</button>
+    </div>
+    <div class="output-body empty" id="outputBody">
+      <span class="empty-icon">◈</span>
+      <span>Fill the fields and hit Generate</span>
+    </div>
+    <div class="token-strip">
+      <span>Token efficiency</span>
+      <div class="token-bar-wrap">
+        <div class="token-bar" id="tokenBar" style="width:0%"></div>
+      </div>
+      <span id="tokenPct">—</span>
+    </div>
+    <div class="open-strip" id="openStrip" style="display:none"></div>
+  </div>
+
+</div>
+
+<script>
+const PHASES = {
+  1: {
+    title: "Phase 01 — Client Brief + Pomelli Prompts",
+    btnClass: "phase-1",
+    btnLabel: "⚡ Generate Brief",
+    efficiency: 92,
+    fields: [
+      { id: "client", label: "Client / Project Name", type: "input", placeholder: "e.g. Apex Skincare" },
+      { id: "goal", label: "Project Goal", type: "textarea", placeholder: "What does the site need to accomplish?", rows: 3 },
+      { id: "audience", label: "Target Audience", type: "input", placeholder: "e.g. Women 28–45, premium skincare buyers" },
+      { id: "platform", label: "Platform", type: "select", options: ["Webflow", "Next.js", "WordPress", "Shopify", "Other"] },
+      { id: "brand", label: "Brand Notes", type: "textarea", placeholder: "Colors, fonts, tone, logo constraints...", rows: 3 },
+    ],
+    systemPrompt: `You are a senior design strategist and prompt engineer. 
+Your job is to produce a clean project brief and Pomelli AI visual generation prompts.
+
+OUTPUT FORMAT — follow this EXACTLY, no preamble:
+
+PROJECT BRIEF
+─────────────
+Objective: [one sentence]
+Audience: [who]
+Platform: [platform]
+Constraints: [brand, tone, deadline notes]
+
+POMELLI PROMPTS
+─────────────
+Hero section: [detailed Pomelli prompt using: Style / Layout / Color palette / Typography feel / Mood / Content blocks / Brand notes]
+About section: [prompt]
+Services/Products section: [prompt]
+CTA section: [prompt]
+Footer: [prompt]
+
+DESIGN DASHBOARD BRIEF
+─────────────
+Title: [client name + project type]
+Description: [2–3 sentences, client-facing pitch language]
+Variants to generate: 3`,
+    userPrompt: (f) => `Client: ${f.client}\nGoal: ${f.goal}\nAudience: ${f.audience}\nPlatform: ${f.platform}\nBrand notes: ${f.brand}`,
+    openLinks: [
+      { label: "Open Pomelli AI", url: "https://pomelli.ai", icon: "✦" },
+    ]
+  },
+  2: {
+    title: "Phase 02 — Pomelli Prompt Refinement",
+    btnClass: "phase-2",
+    btnLabel: "✦ Refine Prompt",
+    efficiency: 88,
+    fields: [
+      { id: "section", label: "Section / Page Area", type: "input", placeholder: "e.g. Hero, Services, About" },
+      { id: "badPrompt", label: "Current Pomelli Prompt (paste it)", type: "textarea", placeholder: "Paste the prompt that produced wrong output...", rows: 4 },
+      { id: "issue", label: "What's Wrong With the Output?", type: "textarea", placeholder: "Too corporate, wrong colors, layout too busy...", rows: 3 },
+      { id: "direction", label: "Target Direction", type: "input", placeholder: "e.g. More editorial, warmer palette, luxury feel" },
+    ],
+    systemPrompt: `You are an expert at writing Pomelli AI visual generation prompts.
+Diagnose the issue with the current prompt and rewrite it.
+
+OUTPUT FORMAT — no preamble:
+
+DIAGNOSIS
+─────────
+[2–3 sentences explaining what's causing the wrong output]
+
+REVISED PROMPT
+─────────
+Style: [value]
+Layout: [value]
+Color palette: [hex values or descriptors]
+Typography feel: [value]
+Mood: [value]
+Content blocks needed: [list]
+Brand notes: [value]
+
+VARIANT A (more conservative)
+─────────
+[same format]
+
+VARIANT B (more experimental)
+─────────
+[same format]`,
+    userPrompt: (f) => `Section: ${f.section}\nCurrent prompt: ${f.badPrompt}\nProblem: ${f.issue}\nTarget direction: ${f.direction}`,
+    openLinks: [
+      { label: "Open Pomelli AI", url: "https://pomelli.ai", icon: "✦" },
+    ]
+  },
+  3: {
+    title: "Phase 03 — Design Dashboard Brief",
+    btnClass: "phase-3",
+    btnLabel: "◈ Build Dashboard Brief",
+    efficiency: 95,
+    fields: [
+      { id: "client", label: "Client Name", type: "input", placeholder: "e.g. Apex Skincare" },
+      { id: "projectType", label: "Project Type", type: "input", placeholder: "e.g. Brand website redesign" },
+      { id: "designs", label: "Design Variants to Present", type: "select", options: ["2 variants", "3 variants", "4 variants"] },
+      { id: "sellingPoint", label: "Key Selling Point of the Designs", type: "textarea", placeholder: "What should the client feel when they see these options?", rows: 3 },
+    ],
+    systemPrompt: `You are writing copy for a Design Dashboard client presentation.
+Output a concise, confident dashboard brief — no fluff.
+
+OUTPUT FORMAT — no preamble:
+
+DASHBOARD BRIEF
+─────────────
+Title: [client name — project type]
+Tagline: [one sharp sentence, 10 words max]
+Description: [2–3 sentences, client-facing, professional but warm]
+Selection Instruction: [one sentence telling the client what to do]
+Variants: [number]
+
+INTERNAL NOTES (for the designer, not shown to client)
+─────────────
+[2–3 bullets on what to watch for during client selection]`,
+    userPrompt: (f) => `Client: ${f.client}\nProject type: ${f.projectType}\nVariants: ${f.designs}\nKey selling point: ${f.sellingPoint}`,
+    openLinks: []
+  },
+  4: {
+    title: "Phase 04 — Implementation Code",
+    btnClass: "phase-4",
+    btnLabel: "⟨/⟩ Generate Code",
+    efficiency: 70,
+    fields: [
+      { id: "platform", label: "Platform", type: "select", options: ["Webflow (CSS/JS embed)", "Next.js (component)", "Next.js (full page)", "Webflow (CMS schema)", "React (standalone)"] },
+      { id: "section", label: "Section / Component Name", type: "input", placeholder: "e.g. Hero section, Pricing card, Nav" },
+      { id: "design", label: "Approved Design Description", type: "textarea", placeholder: "Describe the approved design or paste Pomelli output summary...", rows: 4 },
+      { id: "brand", label: "Brand Tokens", type: "textarea", placeholder: "Primary color: #1a1a2e\nFont: Syne, DM Sans\nBorder radius: 8px", rows: 3 },
+    ],
+    systemPrompt: `You are a senior frontend developer. Write complete, paste-ready code.
+No partial examples. No explanations before the code.
+
+OUTPUT FORMAT — no preamble:
+
+FILE: [path/filename]
+PURPOSE: [one sentence]
+─────────────────────
+[complete code block — Webflow embed or Next.js component]
+
+INTEGRATION NOTES:
+- [where to paste in Webflow / what file to create in Next.js]
+- [any npm installs needed]
+- [any Webflow class names to match]`,
+    userPrompt: (f) => `Platform: ${f.platform}\nSection: ${f.section}\nApproved design: ${f.design}\nBrand tokens: ${f.brand}`,
+    openLinks: [
+      { label: "Open Webflow", url: "https://webflow.com", icon: "◻" },
+    ]
+  },
+  5: {
+    title: "Phase 05 — Handoff Doc + SOP",
+    btnClass: "phase-5",
+    btnLabel: "📋 Generate Handoff",
+    efficiency: 85,
+    fields: [
+      { id: "client", label: "Client Name", type: "input", placeholder: "e.g. Apex Skincare" },
+      { id: "platform", label: "Platform", type: "select", options: ["Webflow", "Next.js", "WordPress", "Shopify", "Other"] },
+      { id: "url", label: "Live URL (if available)", type: "input", placeholder: "https://..." },
+      { id: "delivered", label: "Files / Components Delivered", type: "textarea", placeholder: "hero.tsx — Hero section\nnav.css — Nav embed\n...", rows: 4 },
+      { id: "limits", label: "Known Limitations / Out of Scope", type: "textarea", placeholder: "What was NOT done? What needs future work?", rows: 3 },
+    ],
+    systemPrompt: `You are writing a professional project handoff document.
+Clear, plain-language, no fluff. Client and developer readable.
+
+OUTPUT FORMAT — no preamble:
+
+PROJECT HANDOFF
+─────────────
+Client: [name]
+Platform: [platform]
+Live URL: [url or "TBD"]
+Delivered: [date]
+
+FILES DELIVERED
+─────────────
+[list with one-line purpose per file]
+
+HOW TO EDIT
+─────────────
+[plain-language step-by-step for the client or next developer]
+
+KNOWN LIMITATIONS
+─────────────
+[bullet list]
+
+NEXT STEPS (recommended)
+─────────────
+[2–3 prioritized future improvements]`,
+    userPrompt: (f) => `Client: ${f.client}\nPlatform: ${f.platform}\nURL: ${f.url}\nFiles: ${f.delivered}\nLimitations: ${f.limits}`,
+    openLinks: []
+  }
+};
+
+let currentPhase = 1;
+let currentOutput = "";
+
+function selectPhase(n) {
+  currentPhase = n;
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`[data-phase="${n}"]`).classList.add('active');
+
+  const p = PHASES[n];
+  document.getElementById('panelTitle').textContent = p.title;
+
+  const btn = document.getElementById('btnGenerate');
+  btn.className = `btn-generate ${p.btnClass}`;
+  btn.textContent = p.btnLabel;
+
+  renderFields(p.fields);
+  clearOutput();
+  renderOpenLinks(p.openLinks);
+}
+
+function renderFields(fields) {
+  const fg = document.getElementById('fieldGroup');
+  fg.innerHTML = '';
+  fields.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'field';
+    let input = '';
+    if (f.type === 'input') {
+      input = `<input id="f_${f.id}" type="text" placeholder="${f.placeholder}" />`;
+    } else if (f.type === 'textarea') {
+      input = `<textarea id="f_${f.id}" rows="${f.rows || 3}" placeholder="${f.placeholder}"></textarea>`;
+    } else if (f.type === 'select') {
+      const opts = f.options.map(o => `<option value="${o}">${o}</option>`).join('');
+      input = `<select id="f_${f.id}">${opts}</select>`;
+    }
+    div.innerHTML = `<label>${f.label}</label>${input}`;
+    fg.appendChild(div);
+  });
+}
+
+function getFieldValues() {
+  const p = PHASES[currentPhase];
+  const vals = {};
+  p.fields.forEach(f => {
+    const el = document.getElementById(`f_${f.id}`);
+    vals[f.id] = el ? el.value.trim() : '';
+  });
+  return vals;
+}
+
+function clearOutput() {
+  const ob = document.getElementById('outputBody');
+  ob.className = 'output-body empty';
+  ob.innerHTML = '<span class="empty-icon">◈</span><span>Fill the fields and hit Generate</span>';
+  currentOutput = '';
+  document.getElementById('outputLabel').textContent = 'Waiting for input';
+  document.getElementById('statusDot').className = 'status-dot';
+  document.getElementById('tokenBar').style.width = '0%';
+  document.getElementById('tokenPct').textContent = '—';
+}
+
+function renderOpenLinks(links) {
+  const strip = document.getElementById('openStrip');
+  if (!links || links.length === 0) { strip.style.display = 'none'; return; }
+  strip.style.display = 'flex';
+  strip.innerHTML = links.map(l =>
+    `<a class="btn-open" href="${l.url}" target="_blank" rel="noopener">${l.icon} ${l.label}</a>`
+  ).join('');
+}
+
+async function generate() {
+  const p = PHASES[currentPhase];
+  const vals = getFieldValues();
+
+  const filled = p.fields.filter(f => !['platform', 'designs'].includes(f.id) && vals[f.id]);
+  if (filled.length < 1) {
+    alert('Fill in at least one field before generating.');
+    return;
+  }
+
+  const btn = document.getElementById('btnGenerate');
+  btn.disabled = true;
+
+  const ob = document.getElementById('outputBody');
+  ob.className = 'output-body';
+  ob.innerHTML = '';
+  currentOutput = '';
+
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot thinking';
+  document.getElementById('outputLabel').textContent = 'Generating…';
+
+  const tokenBar = document.getElementById('tokenBar');
+  const tokenPct = document.getElementById('tokenPct');
+  tokenBar.style.width = '0%';
+  tokenPct.textContent = '—';
+
+  const userMsg = p.userPrompt(vals);
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: p.systemPrompt,
+        messages: [{ role: 'user', content: userMsg }],
+        stream: true,
+      })
+    });
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            currentOutput += parsed.delta.text;
+            ob.textContent = currentOutput;
+            ob.scrollTop = ob.scrollHeight;
+          }
+        } catch {}
+      }
+    }
+
+    dot.className = 'status-dot active';
+    document.getElementById('outputLabel').textContent = 'Output ready';
+    tokenBar.style.width = p.efficiency + '%';
+    tokenPct.textContent = p.efficiency + '% efficient';
+
+  } catch (err) {
+    ob.textContent = `Error: ${err.message}\n\nCheck your API connection.`;
+    dot.className = 'status-dot';
+    document.getElementById('outputLabel').textContent = 'Error';
+  }
+
+  btn.disabled = false;
+}
+
+function copyOutput() {
+  if (!currentOutput) return;
+  navigator.clipboard.writeText(currentOutput).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+
+// Init
+selectPhase(1);
+</script>
+</body>
+</html>

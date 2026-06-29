@@ -1,0 +1,195 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .header { padding: 1.5rem 0 1rem; }
+  .header h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+  .header p { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .tab { padding: 6px 14px; font-size: 13px; font-weight: 500; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
+  .tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); }
+  .section { display: none; }
+  .section.active { display: block; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .item { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 12px; }
+  .item:last-child { border-bottom: none; }
+  .item-label { flex: 1; color: var(--color-text-primary); line-height: 1.5; }
+  .item-sub { font-size: 11px; color: var(--color-text-secondary); }
+  .badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
+  .done { background: var(--color-background-success); color: var(--color-text-success); }
+  .wip { background: var(--color-background-warning); color: var(--color-text-warning); }
+  .todo { background: var(--color-background-danger); color: var(--color-text-danger); }
+  .pending { background: var(--color-background-info); color: var(--color-text-info); }
+  .legend { display: flex; gap: 12px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--color-text-secondary); }
+  .full { grid-column: 1 / -1; }
+  .section-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; margin-top: 14px; }
+  .cta { margin-top: 14px; padding: 10px 14px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+  .cta strong { color: var(--color-text-primary); }
+  .action-btn { margin-top: 10px; font-size: 12px; color: var(--color-text-info); cursor: pointer; background: none; border: none; padding: 0; }
+</style>
+
+<div class="header">
+  <h2>AI OS + Marketing Ops — State of Play</h2>
+  <p>What's built, what's in progress, and what still needs to ship</p>
+</div>
+
+<div class="legend">
+  <div class="leg"><span class="badge done">Live</span> Deployed / functional</div>
+  <div class="leg"><span class="badge wip">In progress</span> Partially built</div>
+  <div class="leg"><span class="badge pending">Pending</span> Ready to send / action needed</div>
+  <div class="leg"><span class="badge todo">Not started</span> Defined, not built</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('aios')">AI OS / Infrastructure</button>
+  <button class="tab" onclick="show('marketing')">Marketing Dashboards</button>
+  <button class="tab" onclick="show('ssh')">SSH / Connectivity</button>
+  <button class="tab" onclick="show('gaps')">Priority Gaps</button>
+</div>
+
+<div id="aios" class="section active">
+  <div class="row">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-terminal-2" style="font-size:16px" aria-hidden="true"></i> Skills (Claude)</div>
+      <div class="item"><div class="item-label">roofing-ops.skill<div class="item-sub">Doc extraction + multi-system routing</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">roofing-knowledge-binder.skill<div class="item-sub">Strategy + planning layer</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">leap-scraper.skill<div class="item-sub">40+ slash commands, Leap CRM reverse-eng.</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">estimator-scheduler.skill (v2)<div class="item-sub">Maps, drag-drop, CSV/iCal, AI doc import</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">mocs-master-audit.skill<div class="item-sub">Marketing 360 compliance + legal evidence</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">crabfleet.skill<div class="item-sub">Mission control for OpenClaw agent runs</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">token-optimization-workflow.skill<div class="item-sub">Design pipeline: Pomelli + Design Dashboard</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">business-command-launcher.skill<div class="item-sub">Interactive command center dashboard</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">mocs-marketing360-dashboard.skill<div class="item-sub">Health scoring + Word report gen</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">weekly-update.skill<div class="item-sub">Connected account reporting</div></div><span class="badge wip">In progress</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-topology-star" style="font-size:16px" aria-hidden="true"></i> Agent / Orchestration</div>
+      <div class="item"><div class="item-label">OpenClaw / Crabfleet platform<div class="item-sub">clawfleet.openclaw.ai — cards, runs, crabboxes</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Vercel AI Gateway<div class="item-sub">ai-gateway.vercel.sh — routes Claude API</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Anthropic Agent SDK (TypeScript)<div class="item-sub">/home/claude/my-agent/ — quickstart scaffolded</div></div><span class="badge wip">In progress</span></div>
+      <div class="item"><div class="item-label">Agency System (Next.js)<div class="item-sub">MOCS + OpenClaw, scaffolded 42 files, Vercel-ready</div></div><span class="badge wip">In progress</span></div>
+      <div class="item"><div class="item-label">GitHub OAuth connection<div class="item-sub">Needed for push/PR from Claude</div></div><span class="badge todo">Not started</span></div>
+      <div class="item"><div class="item-label">Telegram bot (quick-send)<div class="item-sub">Bot API, no MCP — ready to build</div></div><span class="badge todo">Not started</span></div>
+      <div class="item"><div class="item-label">Modular skill self-eval + patching<div class="item-sub">Eval → gap table → patch → repackage loop</div></div><span class="badge done">Live</span></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="card full">
+      <div class="card-title"><i class="ti ti-server" style="font-size:16px" aria-hidden="true"></i> Infrastructure / Server</div>
+      <div class="row" style="margin-bottom:0">
+        <div>
+          <div class="item"><div class="item-label">Windows Server + IIS<div class="item-sub">Self-hosted, dashboards deployed here</div></div><span class="badge done">Live</span></div>
+          <div class="item"><div class="item-label">Vercel (Next.js deploy target)<div class="item-sub">Agency system deploy path</div></div><span class="badge done">Live</span></div>
+          <div class="item"><div class="item-label">SQL Server / Azure Blob (shared comments)<div class="item-sub">Swap-in point coded, not connected</div></div><span class="badge todo">Not started</span></div>
+        </div>
+        <div>
+          <div class="item"><div class="item-label">Repo + .gitignore scaffolded<div class="item-sub">topside-roofing monorepo, secrets managed</div></div><span class="badge done">Live</span></div>
+          <div class="item"><div class="item-label">GitHub repo (remote)<div class="item-sub">OAuth not yet connected to Claude</div></div><span class="badge todo">Not started</span></div>
+          <div class="item"><div class="item-label">Cloudflare D1 / Wrangler (Crabfleet)<div class="item-sub">CI pipeline, deploy scripts in skill</div></div><span class="badge done">Live</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="marketing" class="section">
+  <div class="row">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-chart-bar" aria-hidden="true" style="font-size:16px"></i> Dashboards</div>
+      <div class="item"><div class="item-label">Marketing Health Dashboard (dual-view)<div class="item-sub">Executive + Deep Analysis, IIS-deployed HTML</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Google Marketing Console<div class="item-sub">GSC + GA4 audit dashboard, IIS-deployed</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Marketing 360 Dashboard (AI upload)<div class="item-sub">Drag-drop PDF → health score + Word report</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Marketing 360 Manual Dashboard<div class="item-sub">Manual-entry fallback version</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Topside Crabfleet Kanban Board<div class="item-sub">19 cards, 5 lanes, 6 tags, action buttons</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Shared comment threads (cross-user)<div class="item-sub">Coded, needs SQL Server / Azure Blob backend</div></div><span class="badge todo">Not started</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-file-analytics" aria-hidden="true" style="font-size:16px"></i> Marketing 360 Audit (MOCS)</div>
+      <div class="item"><div class="item-label">Contract analysis complete<div class="item-sub">Hidden fee, 53-day delay, unaccounted funds</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">GSC position decline documented<div class="item-sub">14.3 → 24.4 avg position under M360</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Written deliverable commitments on record<div class="item-sub">4 blogs, 4 emails, 8 social posts/month</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Conversion collapse logged<div class="item-sub">62% drop; tracking likely broken</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Accountability email to Tyler Hatton<div class="item-sub">Draft complete, GSC CSVs ready to attach</div></div><span class="badge pending">Pending send</span></div>
+      <div class="item"><div class="item-label">Contact form + conversion tracking verification<div class="item-sub">Not yet confirmed functional</div></div><span class="badge todo">Not started</span></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="card full">
+      <div class="card-title"><i class="ti ti-world" aria-hidden="true" style="font-size:16px"></i> Website / Client Work</div>
+      <div class="row" style="margin-bottom:0">
+        <div>
+          <div class="item"><div class="item-label">Topside Bellingham redesign (HTML)<div class="item-sub">Hero section, falling shingles, GAF badge</div></div><span class="badge wip">In progress</span></div>
+          <div class="item"><div class="item-label">GAF badge gyroscopic animation<div class="item-sub">3-layer CSS, base64 embedded</div></div><span class="badge wip">In progress</span></div>
+        </div>
+        <div>
+          <div class="item"><div class="item-label">Badge left-of-headline layout fix<div class="item-sub">Flex row reposition — last session ended mid-task</div></div><span class="badge todo">Not started</span></div>
+          <div class="item"><div class="item-label">Full Webflow/Next.js site production build<div class="item-sub">Token optimization workflow applies here</div></div><span class="badge todo">Not started</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ssh" class="section">
+  <div class="row">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-terminal" aria-hidden="true" style="font-size:16px"></i> What's established</div>
+      <div class="item"><div class="item-label">Crabfleet SSH gateway<div class="item-sub">crabd.sh — SSH to crabbox workspaces via OpenClaw gateway</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Crabfleet CLI (Go)<div class="item-sub">Cards, runs, attach commands documented in skill</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Vercel AI Gateway (HTTPS API proxy)<div class="item-sub">Routes Claude API calls, env configured</div></div><span class="badge done">Live</span></div>
+      <div class="item"><div class="item-label">Windows Server / IIS (self-hosted)<div class="item-sub">Serves dashboard HTML — SSH access implied</div></div><span class="badge done">Live</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-plug-connected-x" aria-hidden="true" style="font-size:16px"></i> Not yet established</div>
+      <div class="item"><div class="item-label">Claude ↔ GitHub SSH/OAuth<div class="item-sub">Needed for push/PR; OAuth flow not completed</div></div><span class="badge todo">Not started</span></div>
+      <div class="item"><div class="item-label">MCP server (custom) on Windows Server<div class="item-sub">Would expose IIS-hosted tools to Claude directly</div></div><span class="badge todo">Not started</span></div>
+      <div class="item"><div class="item-label">Reverse tunnel / ngrok (remote dev access)<div class="item-sub">Local Windows Server → public endpoint for Claude tools</div></div><span class="badge todo">Not started</span></div>
+      <div class="item"><div class="item-label">Persistent agent SSH loop (crabd.sh → server)<div class="item-sub">Long-running agent connected to your IIS instance</div></div><span class="badge todo">Not started</span></div>
+      <div class="item"><div class="item-label">Telegram bot (notification channel)<div class="item-sub">Quick-send from Claude → your phone; Bot API ready</div></div><span class="badge todo">Not started</span></div>
+    </div>
+  </div>
+  <div class="cta">
+    <strong>The core SSH gap:</strong> You have Crabfleet's SSH gateway for agent workspaces, but there's no persistent, secure tunnel from Claude → your Windows Server / IIS instance. The three realistic paths are: (1) a lightweight MCP server running on your Windows box exposed via ngrok or Cloudflare Tunnel, (2) GitHub OAuth so Claude can push/pull code changes without manual copy-paste, and (3) a Telegram bot as a quick notification/send channel that bridges Claude → your phone without a full integration.
+    <br><br>
+    <button class="action-btn" onclick="sendPrompt('Let\'s establish the SSH connector setup — walk me through the best path to connect Claude to my Windows Server and get GitHub OAuth working ↗')">Start SSH setup plan ↗</button>
+  </div>
+</div>
+
+<div id="gaps" class="section">
+  <div class="section-label">Highest priority — blocking or almost blocking</div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="item"><div class="item-label"><strong>Send accountability email to Tyler Hatton (Marketing 360)</strong><div class="item-sub">Draft complete. GSC CSV attachments ready. This is the most time-sensitive item — every day it sits unsent erodes leverage.</div></div><span class="badge pending">Pending</span></div>
+    <div class="item"><div class="item-label"><strong>Topside website hero layout fix (badge left of headline)</strong><div class="item-sub">Last session ended mid-execution. File is /mnt/user-data/outputs/topside-roofing-redesign.html — ready to finish.</div></div><span class="badge todo">Resume</span></div>
+    <div class="item"><div class="item-label"><strong>GitHub OAuth connection in Claude.ai Settings → Connections</strong><div class="item-sub">Single biggest unlock for the dev workflow. Enables push/PR/repo creation without manual copy-paste.</div></div><span class="badge todo">Not started</span></div>
+  </div>
+  <div class="section-label">Second tier — important but not blocked</div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="item"><div class="item-label"><strong>Windows Server MCP server + Cloudflare Tunnel / ngrok</strong><div class="item-sub">Enables Claude to talk directly to your IIS instance. Unlocks real-time dashboard data pulls and server-side automation.</div></div><span class="badge todo">Not started</span></div>
+    <div class="item"><div class="item-label"><strong>Contact form + conversion tracking audit</strong><div class="item-sub">M360 dashboard showing 62% conversion drop is meaningless until you confirm the form is actually submitting and tracking is firing.</div></div><span class="badge todo">Not started</span></div>
+    <div class="item"><div class="item-label"><strong>Agency System (Next.js) → deploy to Vercel</strong><div class="item-sub">42-file scaffold is built. Needs GitHub push + Vercel import. 5 steps once GitHub OAuth is connected.</div></div><span class="badge wip">Blocked on GitHub</span></div>
+    <div class="item"><div class="item-label"><strong>Telegram bot (quick send)</strong><div class="item-sub">Bot API path is clear. ~15-minute build once prioritized. Good for alerts and field quick-sends.</div></div><span class="badge todo">Not started</span></div>
+  </div>
+  <div class="section-label">Third tier — infrastructure hardening</div>
+  <div class="card">
+    <div class="item"><div class="item-label"><strong>SQL Server / Azure Blob for shared dashboard comments</strong><div class="item-sub">Swap-in point is already coded in the marketing dashboard. Needs backend provisioning.</div></div><span class="badge todo">Not started</span></div>
+    <div class="item"><div class="item-label"><strong>Anthropic Agent SDK — build first real agentic task</strong><div class="item-sub">Scaffolded at /home/claude/my-agent/. Needs ANTHROPIC_API_KEY in .env and a first real workflow.</div></div><span class="badge wip">In progress</span></div>
+    <div class="item"><div class="item-label"><strong>weekly-update.skill — finish and eval</strong><div class="item-sub">Skill exists but flagged in-progress. Needs connected account data sources and eval pass.</div></div><span class="badge wip">In progress</span></div>
+  </div>
+  <div class="cta">
+    <strong>Bottom line:</strong> The AI OS foundation is legitimately solid — 9 live skills, dual dashboard stack, Crabfleet agent orchestration, Vercel gateway, and a full repo structure. The remaining gaps cluster around two things: (1) connectivity — getting Claude actually wired to GitHub, your Windows Server, and a quick-send channel, and (2) one time-sensitive pending action that's been sitting too long.
+    <br><br>
+    <button class="action-btn" onclick="sendPrompt('Let\'s start with the three highest-priority gaps — send the accountability email, finish the badge layout fix, and get GitHub OAuth connected ↗')">Tackle the top 3 now ↗</button>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Topside AI OS Control Center</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="mark">T</span><div><strong>Topside AI OS</strong><small>Action Control Center</small></div></div>
+    <div class="status"><span></span> READY <time id="clock"></time></div>
+  </header>
+  <div class="layout">
+    <aside>
+      <label for="search">Find an action</label>
+      <input id="search" type="search" placeholder="Search all jobs and tools">
+      <nav id="nav"></nav>
+      <h3>Dashboards</h3>
+      <div id="tools" class="tool-list"></div>
+    </aside>
+    <main>
+      <section class="hero">
+        <div><p class="eyebrow">Unified operating system</p><h1>Choose a job. Launch the right workflow.</h1>
+        <p>Every badge opens an actionable job packet with inputs, steps, deliverables, skills, and the correct dashboard.</p></div>
+        <div class="stats"><strong id="actionCount">0</strong><span>callable actions</span></div>
+      </section>
+      <div id="sections"></div>
+    </main>
+  </div>
+
+  <dialog id="actionDialog">
+    <form method="dialog" class="dialog-shell">
+      <button class="close" value="cancel" aria-label="Close">×</button>
+      <p class="eyebrow" id="dialogCategory"></p>
+      <h2 id="dialogTitle"></h2>
+      <p id="dialogDescription"></p>
+      <div class="detail-grid">
+        <section><h3>Required inputs</h3><ul id="dialogInputs"></ul></section>
+        <section><h3>Output contract</h3><ul id="dialogOutputs"></ul></section>
+      </div>
+      <label for="context">Job context / pasted data</label>
+      <textarea id="context" rows="7" placeholder="Add the URL, customer details, source data, objective, or notes needed for this run."></textarea>
+      <div class="buttons">
+        <button type="button" class="primary" id="launchClaude">Launch in Claude</button>
+        <button type="button" id="copyTask">Copy task</button>
+        <button type="button" id="downloadTask">Download task</button>
+        <button type="button" id="openTool">Open tool</button>
+      </div>
+      <p class="hint" id="dialogSkill"></p>
+    </form>
+  </dialog>
+  <div id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
