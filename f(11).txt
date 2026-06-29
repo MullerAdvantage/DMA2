@@ -1,0 +1,4 @@
+# Marketing-Sector
+Used for marketing auditing, marketing campaigns, marketing data tracking, using dashboards for project management and use for automated AI OS for the marketing of Topside
+
+| `/perform` | Ingest real-time pasted objective outlines, process parameters, and execute the exact tactical tasks described inside. |

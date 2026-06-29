@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Locate and extract gyroscopic badge HTML",
+  "description": "Find the .gyro-wrap block (with rings and image) in the hero, capture it for relocation",
+  "activeForm": "Locating gyroscopic badge",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

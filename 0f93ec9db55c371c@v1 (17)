@@ -1,0 +1,148 @@
+import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
+from pathlib import Path
+
+from marketing_analyzer import (
+    MarketingMetrics,
+    load_csv,
+    summarize,
+    generate_insights,
+    format_report,
+)
+
+
+# ── MarketingMetrics properties ──────────────────────────────────────────────
+
+def test_ctr():
+    assert MarketingMetrics(impressions=10000, clicks=250).ctr == pytest.approx(2.5)
+
+
+def test_ctr_zero_impressions():
+    assert MarketingMetrics(impressions=0, clicks=0).ctr == 0.0
+
+
+def test_cost_per_lead():
+    assert MarketingMetrics(leads=20, calls=10, cost=1500.0).cost_per_lead == pytest.approx(50.0)
+
+
+def test_cost_per_lead_no_leads():
+    assert MarketingMetrics(leads=0, calls=0, cost=500.0).cost_per_lead == 0.0
+
+
+def test_roas():
+    assert MarketingMetrics(cost=1000.0, revenue=5000.0).roas == pytest.approx(5.0)
+
+
+def test_roas_no_spend():
+    assert MarketingMetrics(cost=0.0, revenue=1000.0).roas == 0.0
+
+
+def test_conversion_rate():
+    assert MarketingMetrics(clicks=200, conversions=10).conversion_rate == pytest.approx(5.0)
+
+
+def test_total_leads():
+    assert MarketingMetrics(leads=15, calls=10).total_leads == 25
+
+
+# ── CSV loading ───────────────────────────────────────────────────────────────
+
+def test_load_csv(tmp_path):
+    f = tmp_path / "data.csv"
+    f.write_text(
+        "period,impressions,clicks,leads,calls,cost,revenue,conversions\n"
+        "Jan,10000,300,12,8,1200.0,9500.0,7\n"
+        "Feb,12000,350,15,10,1400.0,11000.0,9\n"
+    )
+    records = load_csv(f)
+    assert len(records) == 2
+    assert records[0].period == "Jan"
+    assert records[0].impressions == 10000
+    assert records[1].cost == pytest.approx(1400.0)
+
+
+def test_load_csv_missing_fields(tmp_path):
+    f = tmp_path / "data.csv"
+    f.write_text("period,clicks\nMarch,100\n")
+    records = load_csv(f)
+    assert records[0].impressions == 0
+    assert records[0].clicks == 100
+
+
+# ── Summarize ─────────────────────────────────────────────────────────────────
+
+def test_summarize_empty():
+    assert summarize([]).impressions == 0
+
+
+def test_summarize_totals():
+    records = [
+        MarketingMetrics(period="Jan", impressions=1000, clicks=50, leads=5, cost=500.0, revenue=3000.0, conversions=3),
+        MarketingMetrics(period="Feb", impressions=2000, clicks=80, leads=8, cost=700.0, revenue=5000.0, conversions=5),
+    ]
+    t = summarize(records)
+    assert t.impressions == 3000
+    assert t.clicks == 130
+    assert t.leads == 13
+    assert t.cost == pytest.approx(1200.0)
+    assert t.revenue == pytest.approx(8000.0)
+    assert t.conversions == 8
+    assert "Jan" in t.period and "Feb" in t.period
+
+
+# ── Report formatting ─────────────────────────────────────────────────────────
+
+def test_format_report_sections():
+    m = MarketingMetrics(period="Q1", impressions=50000, clicks=1500,
+                         leads=45, calls=30, cost=3200.0, revenue=28000.0, conversions=18)
+    report = format_report(m, "Increase ad spend on weekends.")
+    assert "MARKETING PERFORMANCE REPORT" in report
+    assert "KEY METRICS" in report
+    assert "AI INSIGHTS" in report
+    assert "Increase ad spend on weekends." in report
+    assert "50,000" in report
+
+
+# ── Claude integration (mocked) ───────────────────────────────────────────────
+
+@pytest.mark.asyncio
+async def test_generate_insights_calls_claude():
+    m = MarketingMetrics(period="Q1", impressions=50000, clicks=1500,
+                         leads=45, calls=30, cost=3200.0, revenue=28000.0)
+
+    mock_block = MagicMock()
+    mock_block.type = "text"
+    mock_block.text = "Refine ad copy to improve CTR."
+
+    mock_response = MagicMock()
+    mock_response.content = [mock_block]
+
+    with patch("marketing_analyzer.anthropic.AsyncAnthropic") as mock_cls:
+        mock_client = AsyncMock()
+        mock_cls.return_value = mock_client
+        mock_client.messages.create = AsyncMock(return_value=mock_response)
+
+        result = await generate_insights(m)
+
+    assert result == "Refine ad copy to improve CTR."
+    mock_client.messages.create.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_generate_insights_empty_response():
+    m = MarketingMetrics(period="Q1")
+
+    mock_block = MagicMock()
+    mock_block.type = "tool_use"  # not "text"
+
+    mock_response = MagicMock()
+    mock_response.content = [mock_block]
+
+    with patch("marketing_analyzer.anthropic.AsyncAnthropic") as mock_cls:
+        mock_client = AsyncMock()
+        mock_cls.return_value = mock_client
+        mock_client.messages.create = AsyncMock(return_value=mock_response)
+
+        result = await generate_insights(m)
+
+    assert result == ""

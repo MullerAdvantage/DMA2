@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Add CSS for relocated badge container",
+  "description": "Add a tight-padding container style for the badge with a slate background slightly larger than the image, and a falling-shingles canvas container for the why-section",
+  "activeForm": "Adding new CSS",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Add falling-shingles canvas to why-section",
+  "description": "Add a second canvas to the why-section so the shingles animation continues to run behind the relocated badge for visual consistency",
+  "activeForm": "Adding second canvas",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

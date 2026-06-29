@@ -1,0 +1,168 @@
+import anthropic
+import csv
+import argparse
+import asyncio
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Optional
+
+
+@dataclass
+class MarketingMetrics:
+    period: str = ""
+    impressions: int = 0
+    clicks: int = 0
+    leads: int = 0
+    calls: int = 0
+    cost: float = 0.0
+    revenue: float = 0.0
+    conversions: int = 0
+
+    @property
+    def ctr(self) -> float:
+        return (self.clicks / self.impressions * 100) if self.impressions else 0.0
+
+    @property
+    def cost_per_lead(self) -> float:
+        total = self.leads + self.calls
+        return (self.cost / total) if total else 0.0
+
+    @property
+    def conversion_rate(self) -> float:
+        return (self.conversions / self.clicks * 100) if self.clicks else 0.0
+
+    @property
+    def roas(self) -> float:
+        return (self.revenue / self.cost) if self.cost else 0.0
+
+    @property
+    def total_leads(self) -> int:
+        return self.leads + self.calls
+
+
+def load_csv(path: Path) -> list[MarketingMetrics]:
+    records = []
+    with open(path, newline="") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            records.append(MarketingMetrics(
+                period=row.get("period") or row.get("date", ""),
+                impressions=int(row.get("impressions") or 0),
+                clicks=int(row.get("clicks") or 0),
+                leads=int(row.get("leads") or 0),
+                calls=int(row.get("calls") or 0),
+                cost=float(row.get("cost") or 0),
+                revenue=float(row.get("revenue") or 0),
+                conversions=int(row.get("conversions") or 0),
+            ))
+    return records
+
+
+def summarize(records: list[MarketingMetrics]) -> MarketingMetrics:
+    if not records:
+        return MarketingMetrics()
+    total = MarketingMetrics(period=f"{records[0].period} – {records[-1].period}")
+    for r in records:
+        total.impressions += r.impressions
+        total.clicks += r.clicks
+        total.leads += r.leads
+        total.calls += r.calls
+        total.cost += r.cost
+        total.revenue += r.revenue
+        total.conversions += r.conversions
+    return total
+
+
+_MARKETING_SYSTEM = (
+    "You are a concise marketing analyst specializing in home-services advertising. "
+    "Give specific, data-driven recommendations. Use bullet points. One sentence per bullet."
+)
+
+async def generate_insights(metrics: MarketingMetrics, context: str = "roofing company") -> str:
+    client = anthropic.AsyncAnthropic()
+    prompt = (
+        f"{context} | {metrics.period}\n"
+        f"Impressions:{metrics.impressions:,} Clicks:{metrics.clicks:,} CTR:{metrics.ctr:.1f}%\n"
+        f"Leads:{metrics.total_leads} (form:{metrics.leads} calls:{metrics.calls}) CPL:${metrics.cost_per_lead:.2f}\n"
+        f"Cost:${metrics.cost:,.2f} Revenue:${metrics.revenue:,.2f} ROAS:{metrics.roas:.2f}x Conv:{metrics.conversion_rate:.1f}%\n\n"
+        f"3-5 actionable recommendations (one sentence each)."
+    )
+    response = await client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=256,
+        system=[{"type": "text", "text": _MARKETING_SYSTEM, "cache_control": {"type": "ephemeral"}}],
+        messages=[{"role": "user", "content": prompt}],
+    )
+    for block in response.content:
+        if block.type == "text":
+            return block.text
+    return ""
+
+
+def format_report(metrics: MarketingMetrics, insights: str) -> str:
+    sep = "=" * 60
+    return "\n".join([
+        sep,
+        "MARKETING PERFORMANCE REPORT",
+        f"Period: {metrics.period}",
+        sep,
+        "",
+        "KEY METRICS",
+        "-" * 30,
+        f"Impressions:    {metrics.impressions:>12,}",
+        f"Clicks:         {metrics.clicks:>12,}  (CTR: {metrics.ctr:.1f}%)",
+        f"Total Leads:    {metrics.total_leads:>12}",
+        f"  Form leads:   {metrics.leads:>12}",
+        f"  Calls:        {metrics.calls:>12}",
+        f"Cost:           ${metrics.cost:>11,.2f}",
+        f"Cost/Lead:      ${metrics.cost_per_lead:>11.2f}",
+        f"Conversions:    {metrics.conversions:>12}  ({metrics.conversion_rate:.1f}%)",
+        f"Revenue:        ${metrics.revenue:>11,.2f}",
+        f"ROAS:           {metrics.roas:>11.2f}x",
+        "",
+        "AI INSIGHTS",
+        "-" * 30,
+        insights,
+        sep,
+    ])
+
+
+async def analyze(
+    csv_path: Optional[Path] = None,
+    output_path: Optional[Path] = None,
+    context: str = "roofing company",
+) -> tuple[MarketingMetrics, str]:
+    if csv_path:
+        records = load_csv(csv_path)
+        metrics = summarize(records)
+    else:
+        metrics = MarketingMetrics(
+            period="Demo",
+            impressions=50000, clicks=1500,
+            leads=45, calls=30,
+            cost=3200.0, revenue=28000.0, conversions=18,
+        )
+
+    insights = await generate_insights(metrics, context)
+    report = format_report(metrics, insights)
+
+    if output_path:
+        output_path.write_text(report)
+        print(f"Report saved to {output_path}")
+    else:
+        print(report)
+
+    return metrics, insights
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Marketing performance analyzer")
+    parser.add_argument("csv", nargs="?", type=Path, help="Path to marketing data CSV")
+    parser.add_argument("--output", "-o", type=Path, help="Save report to a file")
+    parser.add_argument("--context", default="roofing company", help="Business context for AI insights")
+    args = parser.parse_args()
+    asyncio.run(analyze(args.csv, args.output, args.context))
+
+
+if __name__ == "__main__":
+    main()

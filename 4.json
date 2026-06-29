@@ -1,0 +1,9 @@
+{
+  "id": "4",
+  "subject": "Move HTML: relocate badge to why-section, remove from hero",
+  "description": "Remove the .gyro-wrap div from the hero-left and add it as a new right-quadrant element above the .why-stat-stack",
+  "activeForm": "Moving the badge HTML",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}
