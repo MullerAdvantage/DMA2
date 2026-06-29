@@ -1,0 +1,10 @@
+.env.local
+.env
+node_modules/
+.next/
+out/
+dist/
+mocs/evidence/
+*.log
+.DS_Store
+Thumbs.db
